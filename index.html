@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0a0805">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Finis Africae</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📜</text></svg>">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#0a0805;--s1:#12100c;--s2:#1a1710;--border:#2e2a1e;--text:#e8dfc8;--muted:#6b6045;--gold:#c8a96e;--gold2:#a07840;--parchment:#d4c89a;--red:#8b2020;--green:#2a5a3a;--font:'Georgia','Times New Roman',serif;--mono:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);overflow:hidden}
+.app{display:flex;flex-direction:column;height:100vh;max-width:480px;margin:0 auto;background:var(--bg);position:relative}
+.hdr{padding:0;background:var(--s1);border-bottom:1px solid var(--border);flex-shrink:0}
+.hdr-ornament{height:3px;background:linear-gradient(90deg,transparent,var(--gold2),var(--gold),var(--gold2),transparent)}
+.hdr-inner{padding:12px 16px 10px}
+.hdr-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
+.logo-wrap{display:flex;flex-direction:column}
+.logo-latin{font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:2px;font-style:italic;font-family:var(--mono)}
+.logo{font-size:22px;font-weight:400;letter-spacing:1px;color:var(--parchment);font-style:italic;line-height:1;text-shadow:0 0 30px rgba(200,169,110,.2)}
+.logo-sub{font-size:8px;letter-spacing:4px;color:var(--muted);text-transform:uppercase;margin-top:3px;font-family:var(--mono)}
+.hdr-btns{display:flex;gap:6px;margin-top:4px}
+.ibtn{width:32px;height:32px;border-radius:3px;background:var(--s2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;transition:border-color .15s}
+.ibtn:hover{border-color:var(--gold2)}
+.hdr-divider{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.hdr-divider-line{flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent)}
+.hdr-divider-dot{width:4px;height:4px;border-radius:50%;background:var(--gold2);flex-shrink:0}
+.sbox{position:relative}
+.sinput{width:100%;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:3px;padding:8px 12px 8px 30px;color:var(--text);font-size:13px;font-family:var(--mono);outline:none;transition:border-color .15s}
+.sinput:focus{border-color:var(--gold2)}
+.sinput::placeholder{color:var(--muted);font-style:italic}
+.sicon{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--muted);pointer-events:none}
+.sresults{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--s1);border:1px solid var(--border);border-radius:3px;z-index:40;max-height:220px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.6)}
+.sitem{padding:9px 12px;font-size:12px;cursor:pointer;border-bottom:1px solid var(--border);font-family:var(--mono)}
+.sitem:hover{background:rgba(200,169,110,.06)}
+.hdr-bottom-ornament{height:1px;background:linear-gradient(90deg,transparent,var(--gold2),transparent);opacity:.4}
+.stats{display:flex;gap:0;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--s1)}
+.stat{flex:1;text-align:center;padding:10px 4px;cursor:pointer;border-right:1px solid var(--border);transition:background .15s;position:relative}
+.stat:last-child{border-right:none}
+.stat.on{background:rgba(200,169,110,.05)}
+.stat.on::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.stat b{display:block;font-size:18px;font-weight:400;color:var(--gold);line-height:1;font-family:var(--font)}
+.stat span{font-size:8px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;font-family:var(--mono)}
+.tabs{display:flex;border-bottom:1px solid var(--border);background:var(--s1);flex-shrink:0}
+.tab{flex:1;padding:8px 4px;text-align:center;font-size:10px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;font-family:var(--mono);letter-spacing:.5px;text-transform:uppercase}
+.tab.on{color:var(--gold);border-bottom-color:var(--gold)}
+.content{flex:1;overflow-y:auto;padding:12px 16px 80px;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.content::-webkit-scrollbar{width:3px}
+.content::-webkit-scrollbar-thumb{background:var(--border)}
+.slabel{font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin:14px 0 10px;display:flex;align-items:center;gap:10px;font-family:var(--mono)}
+.slabel::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
+/* Filter bar */
+.fbar{display:flex;gap:6px;flex-wrap:wrap;padding:8px 16px;background:var(--s1);border-bottom:1px solid var(--border);flex-shrink:0}
+.fbar-chip{padding:3px 10px;border-radius:2px;border:1px solid var(--gold2);background:rgba(200,169,110,.08);color:var(--gold);font-size:10px;font-family:var(--mono);cursor:pointer;display:flex;align-items:center;gap:5px}
+.fbar-chip button{background:none;border:none;color:var(--gold);cursor:pointer;font-size:13px;line-height:1;padding:0 0 0 2px}
+.rcard{background:linear-gradient(135deg,rgba(200,169,110,.06),rgba(42,90,58,.03));border:1px solid rgba(200,169,110,.14);border-radius:3px;padding:12px;margin-bottom:12px;cursor:pointer;position:relative}
+.rcard::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold2),transparent);opacity:.4}
+.rcard-lbl{font-size:8px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:9px;font-family:var(--mono)}
+.rcard-inner{display:flex;gap:12px}
+.rinfo{flex:1;min-width:0}
+.rtitle{font-size:15px;font-style:italic;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--parchment)}
+.rauthor{font-size:10px;color:var(--muted);margin-bottom:8px;font-family:var(--mono);cursor:pointer}
+.rauthor:hover{color:var(--gold)}
+.pbar-lbl{display:flex;justify-content:space-between;font-size:9px;color:var(--muted);margin-bottom:4px;font-family:var(--mono)}
+.pbar{height:3px;background:rgba(0,0,0,.4);border-radius:1px;overflow:hidden}
+.pfill{height:100%;background:linear-gradient(90deg,var(--gold2),var(--gold));border-radius:1px}
+.rnote{font-size:11px;color:rgba(200,169,110,.4);margin-top:6px;font-style:italic;line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bcard{display:flex;gap:11px;padding:10px;background:var(--s1);border-radius:3px;border:1px solid var(--border);margin-bottom:7px;cursor:pointer;transition:border-color .15s,background .15s}
+.bcard:hover{border-color:var(--gold2);background:var(--s2)}
+.binfo{flex:1;min-width:0}
+.btitle{font-size:13px;font-style:italic;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--parchment);cursor:pointer}
+.bauthor{font-size:10px;color:var(--muted);margin-bottom:5px;font-family:var(--mono);cursor:pointer}
+.bauthor:hover{color:var(--gold);text-decoration:underline}
+.bmeta{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.sbadge{font-size:8px;padding:2px 7px;border-radius:2px;white-space:nowrap;font-family:var(--mono);letter-spacing:.3px}
+.s-leido{background:rgba(42,90,58,.15);color:#5a9a6a;border:1px solid rgba(42,90,58,.3)}
+.s-leyendo{background:rgba(200,169,110,.1);color:var(--gold);border:1px solid rgba(200,169,110,.2)}
+.s-pendiente{background:rgba(107,96,69,.1);color:var(--muted);border:1px solid rgba(107,96,69,.2)}
+.s-abandonado{background:rgba(139,32,32,.08);color:#a05050;border:1px solid rgba(139,32,32,.15)}
+.gtag{font-size:8px;color:var(--muted);background:var(--s2);padding:2px 6px;border-radius:2px;border:1px solid var(--border);font-family:var(--mono);cursor:pointer}
+.gtag:hover{border-color:var(--gold2);color:var(--gold)}
+.ytag{font-size:8px;color:var(--muted);font-family:var(--mono);cursor:pointer}
+.ytag:hover{color:var(--gold)}
+.bact{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+.plbl{font-size:8px;padding:2px 6px;border-radius:2px;background:rgba(139,32,32,.08);color:#a05050;border:1px solid rgba(139,32,32,.15);font-family:var(--mono)}
+.empty{text-align:center;padding:3rem 1rem;color:var(--muted);font-style:italic}
+.empty-icon{font-size:40px;margin-bottom:12px;opacity:.5}
+.empty-text{font-size:14px;line-height:1.8}
+.lcard{display:flex;align-items:center;gap:11px;padding:10px;background:var(--s1);border-radius:3px;border:1px solid rgba(139,32,32,.15);margin-bottom:7px}
+.lavatar{width:32px;height:32px;border-radius:50%;background:rgba(139,32,32,.08);border:1px solid rgba(139,32,32,.15);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.linfo{flex:1;min-width:0}
+.ltitle{font-size:13px;font-style:italic;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lperson{font-size:10px;color:var(--muted);font-family:var(--mono)}
+.reccard{display:flex;gap:11px;padding:10px;background:var(--s1);border-radius:3px;border:1px solid var(--border);margin-bottom:7px}
+.recinfo{flex:1;min-width:0}
+.rectitle{font-size:13px;font-style:italic;margin-bottom:2px;color:var(--parchment)}
+.recauthor{font-size:10px;color:var(--muted);margin-bottom:4px;font-family:var(--mono)}
+.recreason{font-size:11px;color:rgba(200,169,110,.5);line-height:1.5;margin-bottom:7px;font-style:italic}
+.reclinks{display:flex;gap:5px;flex-wrap:wrap}
+.reclink{font-size:9px;padding:3px 8px;border-radius:2px;border:1px solid var(--border);color:var(--muted);cursor:pointer;background:var(--s2);text-decoration:none;font-family:var(--mono);transition:all .15s}
+.reclink:hover{border-color:var(--gold2);color:var(--gold)}
+.sbar-wrap{margin-bottom:10px}
+.sbar-label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;font-family:var(--mono)}
+.sbar-track{height:6px;background:var(--s2);border-radius:1px;overflow:hidden}
+.sbar-fill{height:100%;border-radius:1px;background:linear-gradient(90deg,var(--gold2),var(--gold))}
+.modal{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.88);display:flex;align-items:flex-end;justify-content:center}
+.modal-box{background:var(--s1);border-radius:0;border-top:1px solid var(--border);width:100%;max-width:480px;max-height:92vh;overflow-y:auto;padding:0 0 40px}
+.modal-ornament{height:2px;background:linear-gradient(90deg,transparent,var(--gold2),transparent);margin-bottom:0}
+.modal-head{padding:14px 16px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.modal-title{font-size:15px;font-style:italic;flex:1;color:var(--parchment)}
+.modal-close{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1}
+.modal-body{padding:16px}
+.mfield{margin-bottom:14px}
+.mfield label{display:block;font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;font-family:var(--mono)}
+.minput{width:100%;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:2px;padding:9px 12px;color:var(--text);font-size:13px;font-family:var(--mono);outline:none;transition:border-color .15s}
+.minput:focus{border-color:var(--gold2)}
+.minput::placeholder{color:var(--muted)}
+.mselect{display:flex;gap:6px;flex-wrap:wrap}
+.mopt{padding:5px 11px;border-radius:2px;font-size:10px;border:1px solid var(--border);color:var(--muted);cursor:pointer;background:var(--s2);font-family:var(--mono);transition:all .15s}
+.mopt.on{border-color:var(--gold2);color:var(--gold);background:rgba(200,169,110,.08)}
+.mbtn{width:100%;padding:12px;border-radius:2px;border:1px solid var(--gold2);background:rgba(200,169,110,.1);color:var(--gold);font-size:13px;font-style:italic;font-family:var(--font);cursor:pointer;margin-top:6px;transition:all .15s}
+.mbtn:hover{background:rgba(200,169,110,.15)}
+.mbtn-sec{width:100%;padding:10px;border-radius:2px;border:1px solid var(--border);background:var(--s2);color:var(--muted);font-size:12px;font-family:var(--mono);cursor:pointer;margin-top:8px}
+.isbn-area{background:rgba(0,0,0,.3);border:1px dashed var(--border);border-radius:3px;padding:20px;text-align:center;cursor:pointer;transition:border-color .15s}
+.isbn-area:hover{border-color:var(--gold2)}
+.gb-results{background:var(--s2);border:1px solid var(--border);border-radius:2px;margin-top:6px;max-height:160px;overflow-y:auto;display:none}
+.sar{padding:9px 12px;font-size:12px;cursor:pointer;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:center;font-family:var(--mono)}
+.sar:last-child{border-bottom:none}
+.sar:hover{background:rgba(200,169,110,.05)}
+.dmodal{position:fixed;inset:0;z-index:55;background:var(--bg);display:none;flex-direction:column;overflow-y:auto}
+.dmodal.show{display:flex}
+.dhead{position:sticky;top:0;background:rgba(10,8,5,.97);backdrop-filter:blur(8px);padding:11px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;z-index:1;flex-shrink:0}
+.dhead::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold2),transparent);opacity:.3}
+.dback{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer}
+.dhead-title{font-size:14px;font-style:italic;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--parchment)}
+.dbody{padding:16px}
+.dhero{display:flex;gap:14px;margin-bottom:18px}
+.dcover-big{width:88px;height:124px;border-radius:3px;overflow:hidden;flex-shrink:0;border:1px solid var(--border);box-shadow:3px 3px 12px rgba(0,0,0,.5)}
+.dcover-big img{width:100%;height:100%;object-fit:cover;display:block}
+.dcover-big-ph{width:88px;height:124px;border-radius:3px;background:var(--s2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0;box-shadow:3px 3px 12px rgba(0,0,0,.5)}
+.dmeta{flex:1;min-width:0}
+.dtitle{font-size:17px;font-style:italic;margin-bottom:3px;line-height:1.2;cursor:pointer;color:var(--parchment)}
+.dtitle:hover{color:var(--gold);text-decoration:underline}
+.dauthor{font-size:12px;color:var(--muted);margin-bottom:9px;cursor:pointer;font-family:var(--mono)}
+.dauthor:hover{color:var(--gold);text-decoration:underline}
+.drating{display:flex;gap:4px;font-size:18px;margin-bottom:10px;cursor:pointer;color:var(--gold)}
+.dstatus{display:flex;gap:5px;flex-wrap:wrap}
+.dsopt{padding:4px 9px;border-radius:2px;font-size:9px;border:1px solid var(--border);color:var(--muted);cursor:pointer;background:var(--s2);font-family:var(--mono);transition:all .15s}
+.dsopt.on{border-color:var(--gold2);color:var(--gold);background:rgba(200,169,110,.08)}
+.dsec{font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin:16px 0 8px;font-family:var(--mono);display:flex;align-items:center;gap:8px}
+.dsec::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
+.dnote{width:100%;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:2px;padding:10px 12px;color:var(--text);font-size:13px;font-family:var(--font);font-style:italic;outline:none;resize:none;line-height:1.7;min-height:90px;transition:border-color .15s}
+.dnote:focus{border-color:var(--gold2)}
+.dnote::placeholder{color:var(--muted)}
+.dinfo-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px}
+.dinfo-row span:first-child{color:var(--muted);font-family:var(--mono);font-size:10px;letter-spacing:.5px}
+.dinfo-row input{background:none;border:none;color:var(--text);font-size:12px;font-family:var(--mono);text-align:right;outline:none;width:60%}
+.dbtns{display:flex;gap:7px;flex-wrap:wrap;margin-top:4px}
+.dbtn{flex:1;min-width:110px;padding:9px;border-radius:2px;font-family:var(--mono);font-size:10px;cursor:pointer;text-align:center;border:1px solid var(--border);background:var(--s2);color:var(--muted);transition:all .15s;text-decoration:none;display:flex;align-items:center;justify-content:center;letter-spacing:.3px}
+.dbtn:hover{border-color:var(--gold2);color:var(--gold)}
+.dbtn.danger{border-color:rgba(139,32,32,.2);color:#a05050}
+.imodal{position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.9);display:flex;align-items:flex-end;justify-content:center}
+.ibox{background:var(--s1);border-top:1px solid var(--border);width:100%;max-width:480px;max-height:85vh;overflow-y:auto;padding:0 0 40px}
+.ihead{padding:14px 16px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;position:sticky;top:0;background:var(--s1);z-index:1}
+.ihead-title{font-size:15px;font-style:italic;flex:1;color:var(--parchment)}
+.ibody{padding:16px}
+.ibio-photo{width:76px;height:76px;border-radius:50%;object-fit:cover;object-position:top;border:1px solid var(--border);float:right;margin:0 0 10px 12px;box-shadow:2px 2px 8px rgba(0,0,0,.4)}
+.ibio-text{font-size:13px;color:rgba(232,223,200,.65);line-height:1.85;font-style:italic}
+.ibio-links{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px;clear:both}
+.ilink{font-size:10px;padding:4px 10px;border-radius:2px;border:1px solid var(--border);color:var(--muted);text-decoration:none;background:var(--s2);font-family:var(--mono)}
+.ilink:hover{border-color:var(--gold2);color:var(--gold)}
+.fab{position:fixed;bottom:68px;right:calc(50% - 224px);width:46px;height:46px;border-radius:3px;background:var(--gold2);border:1px solid var(--gold);color:#000;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.4),0 0 10px rgba(200,169,110,.15);z-index:40}
+@media(max-width:480px){.fab{right:16px}}
+.bnav{position:sticky;bottom:0;display:flex;background:rgba(10,8,5,.97);border-top:1px solid var(--border);padding:5px 0 4px;flex-shrink:0;z-index:30;position:relative}
+.bnav::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold2),transparent);opacity:.4}
+.bitem{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:8px;color:var(--muted);cursor:pointer;padding:4px;font-family:var(--mono);letter-spacing:.5px;text-transform:uppercase;transition:color .15s}
+.bitem.on{color:var(--gold)}
+.bitem-icon{font-size:18px}
+.loading{text-align:center;padding:20px;color:var(--muted);font-size:13px;font-style:italic}
+.prog-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.prog-input{width:68px;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:2px;padding:6px 8px;color:var(--text);font-size:12px;font-family:var(--mono);outline:none;text-align:center}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="hdr">
+    <div class="hdr-ornament"></div>
+    <div class="hdr-inner">
+      <div class="hdr-top">
+        <div class="logo-wrap">
+          <div class="logo-latin">Bibliotheca Privata</div>
+          <div class="logo">Finis Africae</div>
+          <div class="logo-sub">Catalogus Librorum</div>
+        </div>
+        <div class="hdr-btns">
+          <div class="ibtn" onclick="openAdd('isbn')" title="ISBN">📷</div>
+          <div class="ibtn" onclick="openAdd('manual')" title="Añadir">➕</div>
+        </div>
+      </div>
+      <div class="hdr-divider"><div class="hdr-divider-line"></div><div class="hdr-divider-dot"></div><div class="hdr-divider-line"></div></div>
+      <div class="sbox">
+        <span class="sicon">🔍</span>
+        <input class="sinput" id="sinput" placeholder="Quaere librum..." oninput="doSearch(this.value)">
+      </div>
+    </div>
+    <div class="hdr-bottom-ornament"></div>
+  </div>
+  <div class="stats" id="stats-bar"></div>
+  <div class="fbar" id="fbar" style="display:none"></div>
+  <div class="tabs">
+    <div class="tab on" onclick="setTab('biblioteca',this)">Biblioteca</div>
+    <div class="tab" onclick="setTab('prestamos',this)">Préstamos</div>
+    <div class="tab" onclick="setTab('recomendaciones',this)">Para ti</div>
+    <div class="tab" onclick="setTab('estadisticas',this)">Stats</div>
+  </div>
+  <div class="content" id="content"></div>
+  <button class="fab" onclick="openAdd('manual')">+</button>
+  <div class="bnav">
+    <div class="bitem on" onclick="setTab('biblioteca',null);setNav(this)"><div class="bitem-icon">📚</div>Biblioteca</div>
+    <div class="bitem" onclick="setTab('prestamos',null);setNav(this)"><div class="bitem-icon">🤝</div>Préstamos</div>
+    <div class="bitem" onclick="setTab('recomendaciones',null);setNav(this)"><div class="bitem-icon">✨</div>Para ti</div>
+    <div class="bitem" onclick="setTab('estadisticas',null);setNav(this)"><div class="bitem-icon">📊</div>Stats</div>
+  </div>
+</div>
+
+<div class="modal" id="add-modal" style="display:none" onclick="if(event.target===this)closeAdd()">
+  <div class="modal-box">
+    <div class="modal-ornament"></div>
+    <div class="modal-head">
+      <div class="modal-title" id="add-modal-title">Añadir libro</div>
+      <button class="modal-close" onclick="closeAdd()">×</button>
+    </div>
+    <div class="modal-body" id="add-body"></div>
+  </div>
+</div>
+
+<div class="dmodal" id="dmodal">
+  <div class="dhead">
+    <button class="dback" onclick="closeDetail()">←</button>
+    <div class="dhead-title" id="d-head-title"></div>
+    <div class="ibtn" onclick="deleteBook()" style="color:#a05050;font-size:13px" title="Eliminar">🗑</div>
+  </div>
+  <div class="dbody" id="d-body"></div>
+</div>
+
+<div class="imodal" id="imodal" style="display:none" onclick="if(event.target===this)closeInfo()">
+  <div class="ibox">
+    <div class="ihead">
+      <div class="ihead-title" id="i-title"></div>
+      <button class="modal-close" onclick="closeInfo()">×</button>
+    </div>
+    <div class="ibody" id="i-body"><div class="loading">Cargando...</div></div>
+  </div>
+</div>
+
+<script>
+const DB={
+  get books(){return JSON.parse(localStorage.getItem('fa-books')||'[]')},
+  set books(v){localStorage.setItem('fa-books',JSON.stringify(v))},
+  get loans(){return JSON.parse(localStorage.getItem('fa-loans')||'[]')},
+  set loans(v){localStorage.setItem('fa-loans',JSON.stringify(v))},
+};
+let currentTab='biblioteca',searchQ='',currentBookId=null;
+let activeFilters={status:null,author:null,genre:null,year:null};
+
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2)}
+function stars(n,max=5){return'★'.repeat(n)+'☆'.repeat(max-n)}
+function fixUrl(url){return url?url.replace('http://','https://').replace('zoom=1','zoom=3'):''}
+function coverEl(book,w,h){
+  const url=fixUrl(book.cover);
+  if(url)return`<img src="${url}" style="width:${w}px;height:${h}px;display:block;object-fit:cover" onerror="this.outerHTML='<div style=\\"width:${w}px;height:${h}px;display:flex;align-items:center;justify-content:center;background:var(--s2);font-size:${Math.round(w*.35)}px\\">${book.emoji||'📖'}</div>'">`;
+  return`<div style="width:${w}px;height:${h}px;display:flex;align-items:center;justify-content:center;background:var(--s2);font-size:${Math.round(w*.35)}px">${book.emoji||'📖'}</div>`;
+}
+function sbadge(s){const m={leido:'s-leido ✓ Leído',leyendo:'s-leyendo 📖 Leyendo',pendiente:'s-pendiente ○ Pendiente',abandonado:'s-abandonado ✕ Abandonado'};const[c,...l]=(m[s]||'s-pendiente ○ Pendiente').split(' ');return`<span class="sbadge ${c}">${l.join(' ')}</span>`}
+function daysAgo(ts){return Math.floor((Date.now()-ts)/(864e5))}
+function esc(s){return(s||''). replace(/'/g,"\'").replace(/"/g,'&quot;')}
+
+// ── FILTER BAR ────────────────────────────
+function getActiveFilterCount(){return Object.values(activeFilters).filter(Boolean).length}
+function renderFilterBar(){
+  const fb=document.getElementById('fbar');
+  const chips=Object.entries(activeFilters).filter(([k,v])=>v).map(([k,v])=>`<div class="fbar-chip">${v}<button onclick="clearFilter('${k}')" title="Quitar filtro">×</button></div>`);
+  if(!chips.length){fb.style.display='none';return}
+  fb.style.display='flex';
+  fb.innerHTML=chips.join('')+`<div class="fbar-chip" style="background:none;border-color:var(--border);color:var(--muted)" onclick="clearAllFilters()">Limpiar todo</div>`;
+}
+function setFilter(key,val){
+  activeFilters[key]=activeFilters[key]===val?null:val;
+  renderFilterBar();renderStats();renderBiblioteca();
+}
+function clearFilter(key){activeFilters[key]=null;renderFilterBar();renderStats();renderBiblioteca()}
+function clearAllFilters(){Object.keys(activeFilters).forEach(k=>activeFilters[k]=null);renderFilterBar();renderStats();renderBiblioteca()}
+
+// ── STATS ─────────────────────────────────
+function renderStats(){
+  const b=DB.books;
+  const c={total:b.length,leido:b.filter(x=>x.status==='leido').length,leyendo:b.filter(x=>x.status==='leyendo').length,pendiente:b.filter(x=>x.status==='pendiente').length,prestado:b.filter(x=>x.loaned).length};
+  document.getElementById('stats-bar').innerHTML=[
+    {k:'null',n:c.total,l:'Total'},{k:'leido',n:c.leido,l:'Leídos'},{k:'leyendo',n:c.leyendo,l:'Leyendo'},{k:'pendiente',n:c.pendiente,l:'Pendientes'},{k:'prestado',n:c.prestado,l:'Prestados',r:true}
+  ].map(i=>`<div class="stat${activeFilters.status==i.k?' on':''}" onclick="setFilter('status','${i.k}')"><b${i.r?' style="color:#a05050"':''}>${i.n}</b><span>${i.l}</span></div>`).join('');
+}
+
+function setTab(tab,el){
+  currentTab=tab;
+  if(el){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));el.classList.add('on')}
+  else{const idx={biblioteca:0,prestamos:1,recomendaciones:2,estadisticas:3}[tab];document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('on',i===idx))}
+  searchQ='';document.getElementById('sinput').value='';
+  if(tab==='biblioteca')renderBiblioteca();
+  else if(tab==='prestamos')renderPrestamos();
+  else if(tab==='recomendaciones')renderRecomendaciones();
+  else renderEstadisticas();
+}
+function setNav(el){document.querySelectorAll('.bitem').forEach(b=>b.classList.remove('on'));el.classList.add('on')}
+function doSearch(q){searchQ=q.toLowerCase();if(currentTab==='biblioteca')renderBiblioteca()}
+
+// ── BIBLIOTECA ────────────────────────────
+function applyFilters(books){
+  let r=books;
+  if(searchQ)r=r.filter(b=>b.title?.toLowerCase().includes(searchQ)||b.author?.toLowerCase().includes(searchQ)||b.genre?.toLowerCase().includes(searchQ));
+  if(activeFilters.status==='prestado')r=r.filter(b=>b.loaned);
+  else if(activeFilters.status&&activeFilters.status!=='null')r=r.filter(b=>b.status===activeFilters.status);
+  if(activeFilters.author)r=r.filter(b=>b.author===activeFilters.author);
+  if(activeFilters.genre)r=r.filter(b=>b.genre===activeFilters.genre);
+  if(activeFilters.year)r=r.filter(b=>b.year==activeFilters.year);
+  return r;
+}
+
+function renderBiblioteca(){
+  const books=applyFilters(DB.books);
+  const el=document.getElementById('content');
+  if(!DB.books.length){el.innerHTML='<div class="empty"><div class="empty-icon">📜</div><div class="empty-text">Tu biblioteca aguarda.<br>Añade tu primer libro con el botón +</div></div>';return}
+  if(!books.length){el.innerHTML='<div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">Nihil inventum est.</div></div>';return}
+  const leyendo=books.filter(b=>b.status==='leyendo');
+  const resto=books.filter(b=>b.status!=='leyendo');
+  let h='';
+  if(leyendo.length){
+    h+='<div class="slabel">Leyendo ahora</div>';
+    leyendo.forEach(b=>{
+      const pct=b.totalPages?Math.round((b.currentPage||0)/b.totalPages*100):0;
+      h+=`<div class="rcard" onclick="openDetail('${b.id}')"><div class="rcard-lbl">· En curso ·</div><div class="rcard-inner"><div style="width:54px;height:76px;border-radius:3px;overflow:hidden;flex-shrink:0;border:1px solid var(--border);box-shadow:2px 2px 8px rgba(0,0,0,.5)">${coverEl(b,54,76)}</div><div class="rinfo"><div class="rtitle">${b.title}</div><div class="rauthor" onclick="event.stopPropagation();setFilter('author','${esc(b.author||'')}')">${b.author||''}</div>${b.totalPages?`<div class="pbar-lbl"><span>Pág ${b.currentPage||0} de ${b.totalPages}</span><span>${pct}%</span></div><div class="pbar"><div class="pfill" style="width:${pct}%"></div></div>`:''} ${b.notes?`<div class="rnote">« ${b.notes} »</div>`:''}</div></div></div>`;
+    });
+  }
+  if(resto.length){
+    h+=`<div class="slabel">${leyendo.length?'Otros libros':'Todos los libros'}</div>`;
+    resto.forEach(b=>{
+      const loan=DB.loans.find(l=>l.bookId===b.id&&!l.returned);
+      h+=`<div class="bcard" onclick="openDetail('${b.id}')"><div style="width:42px;height:60px;border-radius:2px;overflow:hidden;flex-shrink:0;border:1px solid var(--border);box-shadow:1px 1px 6px rgba(0,0,0,.4)">${coverEl(b,42,60)}</div><div class="binfo"><div class="btitle" onclick="event.stopPropagation();showSynopsis('${esc(b.title)}','${esc(b.author||'')}')">${b.title}</div><div class="bauthor" onclick="event.stopPropagation();setFilter('author','${esc(b.author||'')}')">${b.author||''}</div><div class="bmeta">${sbadge(b.status||'pendiente')}${b.genre?`<span class="gtag" onclick="event.stopPropagation();setFilter('genre','${esc(b.genre)}')">${b.genre}</span>`:''}${b.year?`<span class="ytag" onclick="event.stopPropagation();setFilter('year','${b.year}')">${b.year}</span>`:''}${b.rating?`<span style="color:var(--gold);font-size:10px">${stars(b.rating)}</span>`:''}</div></div><div class="bact">${loan?`<span class="plbl">📤 ${loan.person}</span>`:''}</div></div>`;
+    });
+  }
+  el.innerHTML=h;
+}
+
+// ── PRÉSTAMOS ─────────────────────────────
+function renderPrestamos(){
+  const loans=DB.loans.filter(l=>!l.returned);
+  const books=DB.books;
+  const el=document.getElementById('content');
+  if(!loans.length){el.innerHTML='<div class="empty"><div class="empty-icon">🤝</div><div class="empty-text">Sin préstamos activos.<br>Todos tus libros están en casa.</div></div>';return}
+  let h=`<div class="slabel">${loans.length} préstamo${loans.length!==1?'s':''} activo${loans.length!==1?'s':''}</div>`;
+  loans.sort((a,b)=>a.date-b.date).forEach(l=>{
+    const book=books.find(b=>b.id===l.bookId);const d=daysAgo(l.date);
+    h+=`<div class="lcard"><div class="lavatar">👤</div><div class="linfo"><div class="ltitle">${book?.title||'—'}</div><div class="lperson">${l.person} · hace ${d} días</div></div><div style="text-align:right"><div style="font-size:13px;font-weight:400;color:#a05050;font-family:var(--mono)">${d}d</div><button onclick="returnLoan('${l.id}')" style="font-size:9px;padding:3px 8px;border-radius:2px;border:1px solid var(--gold2);background:none;color:var(--gold);cursor:pointer;margin-top:4px;display:block;width:100%;font-family:var(--mono)">Devuelto</button></div></div>`;
+  });
+  el.innerHTML=h;
+}
+function returnLoan(lid){
+  const loans=DB.loans;const l=loans.find(x=>x.id===lid);if(l){l.returned=true;l.returnDate=Date.now()}
+  DB.loans=loans;const books=DB.books;const b=books.find(x=>x.id===l?.bookId);if(b){b.loaned=false;DB.books=books}
+  renderPrestamos();renderStats();
+}
+
+// ── RECOMENDACIONES ───────────────────────
+async function renderRecomendaciones(){
+  const el=document.getElementById('content');
+  el.innerHTML='<div class="loading">Buscando en los anales...</div>';
+  const books=DB.books;const read=books.filter(b=>b.status==='leido');
+  if(read.length<2){el.innerHTML='<div class="empty"><div class="empty-icon">✨</div><div class="empty-text">Lee al menos 2 libros para recibir recomendaciones.<br><br>Asegúrate de que tienen género asignado.</div></div>';return}
+  const genres=[...new Set(read.map(b=>b.genre).filter(Boolean))];
+  const authors=[...new Set(read.map(b=>b.author).filter(Boolean))];
+  const owned=new Set(books.map(b=>b.title?.toLowerCase()));
+  let recs=[];
+  for(const q of [...genres.slice(0,2),...authors.slice(0,2)].slice(0,3)){
+    try{
+      const r=await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=5&orderBy=relevance`);
+      if(!r.ok)continue;const d=await r.json();
+      (d.items||[]).forEach(item=>{
+        const info=item.volumeInfo;const title=info.title;
+        if(!title||owned.has(title.toLowerCase())||recs.find(x=>x.title===title))return;
+        recs.push({title,author:(info.authors||[])[0]||'',cover:fixUrl(info.imageLinks?.thumbnail||''),reason:`Por tu interés en "${q}"`});
+      });
+    }catch(e){}
+  }
+  recs=recs.slice(0,8);
+  if(!recs.length){el.innerHTML='<div class="empty"><div class="empty-icon">✨</div><div class="empty-text">Añade libros con género para recibir recomendaciones.</div></div>';return}
+  let h=`<div class="slabel">${recs.length} recomendaciones</div>`;
+  recs.forEach(rec=>{
+    const q=encodeURIComponent(rec.title+' '+rec.author);
+    h+=`<div class="reccard"><div style="width:42px;height:60px;border-radius:2px;overflow:hidden;flex-shrink:0;border:1px solid var(--border);box-shadow:1px 1px 6px rgba(0,0,0,.4)">${rec.cover?`<img src="${rec.cover}" style="width:42px;height:60px;display:block;object-fit:cover" onerror="this.outerHTML='<div style=\\"width:42px;height:60px;display:flex;align-items:center;justify-content:center;background:var(--s2);font-size:16px\\">📖</div>'">`:`<div style="width:42px;height:60px;display:flex;align-items:center;justify-content:center;background:var(--s2);font-size:16px">📖</div>`}</div><div class="recinfo"><div class="rectitle">${rec.title}</div><div class="recauthor">${rec.author}</div><div class="recreason">— ${rec.reason}</div><div class="reclinks"><a class="reclink" href="https://www.iberlibro.com/servlet/SearchResults?kn=${q}" target="_blank">Iberlibro ↗</a><a class="reclink" href="https://www.todocoleccion.net/libros-segunda-mano/_t~${encodeURIComponent(rec.title)}" target="_blank">Todocolección ↗</a><a class="reclink" href="https://es.wallapop.com/search?keywords=${q}&category_ids=12467" target="_blank">Wallapop ↗</a></div></div></div>`;
+  });
+  el.innerHTML=h;
+}
+
+// ── ESTADÍSTICAS ──────────────────────────
+function renderEstadisticas(){
+  const books=DB.books;const el=document.getElementById('content');
+  if(!books.length){el.innerHTML='<div class="empty"><div class="empty-icon">📊</div><div class="empty-text">Añade libros para ver tus estadísticas.</div></div>';return}
+  const leidos=books.filter(b=>b.status==='leido').length;
+  const yr=new Date().getFullYear();
+  const lyr=books.filter(b=>b.status==='leido'&&b.finishedYear==yr).length;
+  const genres={};books.filter(b=>b.genre).forEach(b=>{genres[b.genre]=(genres[b.genre]||0)+1});
+  const tg=Object.entries(genres).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const auths={};books.filter(b=>b.author).forEach(b=>{auths[b.author]=(auths[b.author]||0)+1});
+  const ta=Object.entries(auths).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const avg=books.filter(b=>b.rating).reduce((s,b)=>s+b.rating,0)/Math.max(books.filter(b=>b.rating).length,1);
+  let h=`<div style="display:flex;gap:8px;margin-bottom:12px"><div style="flex:1;background:var(--s1);border:1px solid var(--border);border-radius:2px;padding:12px;text-align:center"><div style="font-size:26px;color:var(--gold);font-family:var(--font)">${books.length}</div><div style="font-size:9px;color:var(--muted);font-family:var(--mono);letter-spacing:.5px;text-transform:uppercase">Total</div></div><div style="flex:1;background:var(--s1);border:1px solid var(--border);border-radius:2px;padding:12px;text-align:center"><div style="font-size:26px;color:var(--gold);font-family:var(--font)">${leidos}</div><div style="font-size:9px;color:var(--muted);font-family:var(--mono);letter-spacing:.5px;text-transform:uppercase">Leídos</div></div><div style="flex:1;background:var(--s1);border:1px solid var(--border);border-radius:2px;padding:12px;text-align:center"><div style="font-size:26px;color:var(--gold);font-family:var(--font)">${lyr}</div><div style="font-size:9px;color:var(--muted);font-family:var(--mono);letter-spacing:.5px;text-transform:uppercase">Este año</div></div></div>`;
+  if(tg.length){h+='<div class="slabel">Géneros</div>';const mx=tg[0][1];tg.forEach(([g,n])=>{h+=`<div class="sbar-wrap"><div class="sbar-label"><span style="cursor:pointer;color:var(--gold)" onclick="setFilter('genre','${esc(g)}');setTab('biblioteca',null)">${g}</span><span style="color:var(--muted)">${n}</span></div><div class="sbar-track"><div class="sbar-fill" style="width:${Math.round(n/mx*100)}%"></div></div></div>`})}
+  if(ta.length){h+='<div class="slabel">Autores</div>';const mx=ta[0][1];ta.forEach(([a,n])=>{h+=`<div class="sbar-wrap"><div class="sbar-label"><span style="cursor:pointer;color:var(--gold)" onclick="setFilter('author','${esc(a)}');setTab('biblioteca',null)">${a}</span><span style="color:var(--muted)">${n}</span></div><div class="sbar-track"><div class="sbar-fill" style="width:${Math.round(n/mx*100)}%;background:linear-gradient(90deg,var(--gold2),var(--gold))"></div></div></div>`})}
+  h+=`<div class="slabel" style="margin-top:20px">Copia de seguridad</div><div style="display:flex;gap:8px;margin-bottom:10px"><button onclick="exportData()" style="flex:1;padding:10px;border-radius:2px;border:1px solid var(--gold2);background:rgba(200,169,110,.08);color:var(--gold);font-family:var(--mono);font-size:10px;cursor:pointer;letter-spacing:.5px">📥 Exportar</button><label style="flex:1;padding:10px;border-radius:2px;border:1px solid var(--border);background:var(--s2);color:var(--muted);font-family:var(--mono);font-size:10px;cursor:pointer;text-align:center;display:flex;align-items:center;justify-content:center;letter-spacing:.5px">📤 Importar<input type="file" accept=".json" onchange="importData(this)" style="display:none"></label></div><div style="font-size:11px;color:var(--muted);line-height:1.6;background:var(--s2);border-radius:2px;padding:10px;border:1px solid var(--border);font-style:italic">Exporta para guardar una copia. Importa para restaurar en otro dispositivo.</div>`;
+  el.innerHTML=h;
+}
+function exportData(){
+  const data={version:1,exported:new Date().toISOString(),books:DB.books,loans:DB.loans};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');
+  a.href=url;a.download=`finis-africae-${new Date().toISOString().slice(0,10)}.json`;a.click();URL.revokeObjectURL(url);
+}
+function importData(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{const data=JSON.parse(e.target.result);
+    if(!data.books||!Array.isArray(data.books))throw new Error('Formato inválido');
+    if(!confirm(`¿Importar ${data.books.length} libros? Reemplazará tu biblioteca actual.`))return;
+    DB.books=data.books;DB.loans=data.loans||[];renderStats();renderEstadisticas();alert(`✅ ${data.books.length} libros importados.`);
+    }catch(err){alert('Error al importar.');}
+  };reader.readAsText(file);
+}
+
+// ── DETAIL ────────────────────────────────
+function openDetail(id){
+  const book=DB.books.find(b=>b.id===id);if(!book)return;
+  currentBookId=id;document.getElementById('d-head-title').textContent=book.title;
+  renderDetail(book);document.getElementById('dmodal').classList.add('show');
+}
+function renderDetail(book){
+  const loan=DB.loans.find(l=>l.bookId===book.id&&!l.returned);
+  const pct=book.totalPages?Math.round((book.currentPage||0)/book.totalPages*100):0;
+  const sl=['leido','leyendo','pendiente','abandonado'];
+  const slb={leido:'✓ Leído',leyendo:'📖 Leyendo',pendiente:'○ Pendiente',abandonado:'✕ Abandonado'};
+  document.getElementById('d-body').innerHTML=`
+  <div class="dhero">
+    ${book.cover?`<div class="dcover-big"><img src="${fixUrl(book.cover)}" onerror="this.parentNode.outerHTML='<div class=\"dcover-big-ph\">${book.emoji||'📖'}</div>'"></div>`:`<div class="dcover-big-ph">${book.emoji||'📖'}</div>`}
+    <div class="dmeta">
+      <div class="dtitle" onclick="showSynopsis('${esc(book.title)}','${esc(book.author||'')}')">${book.title}</div>
+      <div class="dauthor" onclick="setFilter('author','${esc(book.author||'')}')">${book.author||'Sin autor'}</div>
+      <div class="drating" onclick="setRating(this)" data-id="${book.id}">${[1,2,3,4,5].map(i=>`<span data-val="${i}" style="color:${(book.rating||0)>=i?'var(--gold)':'var(--border)'}">${(book.rating||0)>=i?'★':'☆'}</span>`).join('')}</div>
+      <div class="dstatus">${sl.map(s=>`<div class="dsopt${book.status===s?' on':''}" onclick="setStatus('${book.id}','${s}',this)">${slb[s]}</div>`).join('')}</div>
+    </div>
+  </div>
+  ${book.status==='leyendo'?`<div class="dsec">Progreso</div><div class="prog-row"><span style="font-size:11px;color:var(--muted);font-family:var(--mono)">Página</span><input class="prog-input" type="number" value="${book.currentPage||0}" min="0" onchange="setPage('${book.id}',this.value)"><span style="font-size:11px;color:var(--muted);font-family:var(--mono)">de</span><input class="prog-input" type="number" value="${book.totalPages||''}" placeholder="total" onchange="setTotal('${book.id}',this.value)">${book.totalPages?`<span style="font-size:11px;color:var(--gold);font-family:var(--mono)">${pct}%</span>`:''}</div>${book.totalPages?`<div class="pbar" style="height:4px;margin-top:8px"><div class="pfill" style="width:${pct}%"></div></div>`:''}`:''}
+  <div class="dsec">Notas</div>
+  <textarea class="dnote" placeholder="Reflexiones, frases memorables, opinión..." onchange="setField('${book.id}','notes',this.value)">${book.notes||''}</textarea>
+  <div class="dsec">Información</div>
+  <div class="dinfo-row"><span>Autor</span><input value="${book.author||''}" placeholder="Autor" onchange="setField('${book.id}','author',this.value)"></div>
+  <div class="dinfo-row"><span>Año</span><input value="${book.year||''}" placeholder="Año" type="number" onchange="setField('${book.id}','year',this.value)"></div>
+  <div class="dinfo-row"><span>Género</span><input value="${book.genre||''}" placeholder="Género" onchange="setField('${book.id}','genre',this.value)"></div>
+  <div class="dinfo-row"><span>Editorial</span><input value="${book.publisher||''}" placeholder="Editorial" onchange="setField('${book.id}','publisher',this.value)"></div>
+  <div class="dinfo-row"><span>Idioma original</span><input value="${book.language||''}" placeholder="Idioma" onchange="setField('${book.id}','language',this.value)"></div>
+  <div class="dinfo-row"><span>Páginas</span><input value="${book.totalPages||''}" placeholder="Páginas" type="number" onchange="setTotal('${book.id}',this.value)"></div>
+  <div class="dinfo-row"><span>ISBN</span><input value="${book.isbn||''}" placeholder="ISBN" onchange="setField('${book.id}','isbn',this.value)"></div>
+  <div class="dsec">Acciones</div>
+  <div class="dbtns">
+    ${loan?`<div class="dbtn danger" onclick="returnLoan('${loan.id}');closeDetail()">✅ Devuelto</div>`:`<div class="dbtn" onclick="openLoanModal('${book.id}')">📤 Prestar</div>`}
+    <a class="dbtn" href="https://www.goodreads.com/search?q=${encodeURIComponent((book.title||'')+' '+(book.author||''))}" target="_blank">Goodreads ↗</a>
+    <a class="dbtn" href="https://openlibrary.org/search?q=${encodeURIComponent(book.title||'')} " target="_blank">Open Library ↗</a>
+  </div>`;
+}
+function closeDetail(){document.getElementById('dmodal').classList.remove('show');currentBookId=null;renderBiblioteca();renderStats()}
+function deleteBook(){if(!currentBookId||!confirm('¿Eliminar este libro?'))return;DB.books=DB.books.filter(b=>b.id!==currentBookId);DB.loans=DB.loans.filter(l=>l.bookId!==currentBookId);closeDetail()}
+function setStatus(id,status,el){const books=DB.books;const b=books.find(x=>x.id===id);if(!b)return;b.status=status;if(status==='leido')b.finishedYear=new Date().getFullYear();DB.books=books;document.querySelectorAll('.dsopt').forEach(e=>e.classList.remove('on'));el.classList.add('on');renderDetail(b)}
+function setRating(container){const val=parseInt(event.target.dataset.val||0);if(!val||!currentBookId)return;const books=DB.books;const b=books.find(x=>x.id===currentBookId);if(!b)return;b.rating=val;DB.books=books;container.querySelectorAll('span').forEach((s,i)=>{s.style.color=i<val?'var(--gold)':'var(--border)';s.textContent=i<val?'★':'☆'})}
+function setPage(id,val){const books=DB.books;const b=books.find(x=>x.id===id);if(b){b.currentPage=parseInt(val)||0;DB.books=books}}
+function setTotal(id,val){const books=DB.books;const b=books.find(x=>x.id===id);if(b){b.totalPages=parseInt(val)||0;DB.books=books;renderDetail(b)}}
+function setField(id,field,val){const books=DB.books;const b=books.find(x=>x.id===id);if(b){b[field]=val;DB.books=books}}
+
+// ── LOAN ──────────────────────────────────
+function openLoanModal(bookId){
+  document.getElementById('add-modal-title').textContent='Registrar préstamo';
+  document.getElementById('add-body').innerHTML=`<div class="mfield"><label>A quién prestas</label><input class="minput" id="loan-person" placeholder="Nombre..."></div><button class="mbtn" onclick="saveLoan('${bookId}')">Registrar préstamo</button>`;
+  document.getElementById('add-modal').style.display='flex';
+}
+function saveLoan(bookId){
+  const person=document.getElementById('loan-person')?.value?.trim();if(!person)return alert('Indica el nombre');
+  const loans=DB.loans;loans.push({id:uid(),bookId,person,date:Date.now(),returned:false});DB.loans=loans;
+  const books=DB.books;const b=books.find(x=>x.id===bookId);if(b){b.loaned=true;DB.books=books}
+  closeAdd();const book=DB.books.find(x=>x.id===bookId);if(book)renderDetail(book);renderStats();
+}
+
+// ── ADD BOOK ──────────────────────────────
+let _gbSel=null,_gbTimer=null;
+function openAdd(mode){
+  document.getElementById('add-modal-title').textContent=mode==='isbn'?'Escanear ISBN':'Añadir libro';
+  document.getElementById('add-modal').style.display='flex';_gbSel=null;
+  if(mode==='isbn')renderISBN();else renderManual();
+}
+function renderManual(){
+  document.getElementById('add-body').innerHTML=`
+  <div class="mfield"><label>Título *</label>
+    <input class="minput" id="ai-title" placeholder="Título del libro..." oninput="gbSearch(this.value)">
+    <div class="gb-results" id="gb-results"></div>
+  </div>
+  <div class="mfield"><label>Autor</label><input class="minput" id="ai-author" placeholder="Autor..."></div>
+  <div class="mfield"><label>Género</label><input class="minput" id="ai-genre" placeholder="CF, Historia, Novela, Ensayo..."></div>
+  <div class="mfield"><label>Año</label><input class="minput" id="ai-year" placeholder="Año..." type="number"></div>
+  <div class="mfield"><label>Estado</label><div class="mselect">
+    <div class="mopt on" data-s="pendiente" onclick="selS(this)">○ Pendiente</div>
+    <div class="mopt" data-s="leyendo" onclick="selS(this)">📖 Leyendo</div>
+    <div class="mopt" data-s="leido" onclick="selS(this)">✓ Leído</div>
+  </div></div>
+  <button class="mbtn" onclick="saveManual()">Añadir a mi biblioteca</button>
+  <button class="mbtn-sec" onclick="openAdd('isbn')">📷 Usar ISBN</button>`;
+}
+function selS(el){document.querySelectorAll('.mopt').forEach(e=>e.classList.remove('on'));el.classList.add('on')}
+async function gbSearch(q){
+  const res=document.getElementById('gb-results');
+  if(!q||q.length<3){res.style.display='none';return}
+  clearTimeout(_gbTimer);
+  _gbTimer=setTimeout(async()=>{
+    try{
+      const r=await fetch(`https://www.googleapis.com/books/v1/volumes?q=intitle:${encodeURIComponent(q)}&maxResults=5`);
+      const d=await r.json();const items=d.items||[];
+      if(!items.length){res.style.display='none';return}
+      res.style.display='block';
+      res.innerHTML=items.map(item=>{
+        const info=item.volumeInfo;const cover=fixUrl(info.imageLinks?.thumbnail||'');
+        return`<div class="sar" onclick="fillGB('${item.id}')"><div style="flex-shrink:0">${cover?`<img src="${cover}" style="width:32px;height:44px;border-radius:2px;object-fit:cover" onerror="this.style.display='none'">`:'<div style="width:32px;height:44px;background:var(--bg);border-radius:2px;display:flex;align-items:center;justify-content:center">📖</div>'}</div><div><div style="font-size:12px;font-style:italic;color:var(--parchment)">${info.title}</div><div style="font-size:10px;color:var(--muted)">${(info.authors||[])[0]||''}</div></div></div>`;
+      }).join('');
+    }catch(e){res.style.display='none'}
+  },400);
+}
+async function fillGB(gbId){
+  try{
+    const r=await fetch(`https://www.googleapis.com/books/v1/volumes/${gbId}`);const d=await r.json();const info=d.volumeInfo;
+    document.getElementById('ai-title').value=info.title||'';    document.getElementById('ai-author').value=(info.authors||[])[0]||'';    document.getElementById('ai-genre').value=(info.categories||[])[0]||'';    document.getElementById('ai-year').value=(info.publishedDate||'').slice(0,4);    document.getElementById('gb-results').style.display='none';    _gbSel={title:info.title,author:(info.authors||[])[0]||'',cover:fixUrl(info.imageLinks?.thumbnail||''),genre:(info.categories||[])[0]||'',year:(info.publishedDate||'').slice(0,4),publisher:info.publisher||'',language:info.language||'',isbn:(info.industryIdentifiers||[]).find(x=>x.type==='ISBN_13')?.identifier||'',pages:info.pageCount||0};
+  }catch(e){}
+}
+function saveManual(){
+  const title=document.getElementById('ai-title')?.value?.trim();if(!title)return alert('El título es obligatorio');
+  const status=document.querySelector('.mopt.on')?.dataset?.s||'pendiente';const gb=_gbSel||{};
+  const books=DB.books;
+  books.push({id:uid(),title,author:document.getElementById('ai-author')?.value?.trim()||gb.author||''  ,genre:document.getElementById('ai-genre')?.value?.trim()||gb.genre||''  ,year:document.getElementById('ai-year')?.value?.trim()||gb.year||'',status,cover:gb.cover||''  ,publisher:gb.publisher||'',language:gb.language||'',isbn:gb.isbn||'',totalPages:gb.pages||0,currentPage:0,notes:'',rating:0,loaned:false,addedAt:Date.now(),finishedYear:status==='leido'?new Date().getFullYear():null});
+  DB.books=books;_gbSel=null;closeAdd();renderBiblioteca();renderStats();
+}
+function renderISBN(){
+  document.getElementById('add-body').innerHTML=`
+  <div class="isbn-area" onclick="scanISBN()"><div style="font-size:32px;margin-bottom:8px">📷</div><div style="font-size:13px;color:var(--muted);font-style:italic">Toca para usar la cámara</div></div>
+  <div style="text-align:center;padding:10px 0;font-size:11px;color:var(--muted);font-family:var(--mono)">— o introduce el ISBN —</div>
+  <div class="mfield"><input class="minput" id="isbn-input" placeholder="978-..." oninput="if(this.value.replace(/\D/g,'').length>=10)lookupISBN(this.value)"></div>
+  <div id="isbn-result"></div>
+  <button class="mbtn-sec" onclick="renderManual()">✏️ Añadir manualmente</button>`;
+}
+function scanISBN(){const input=document.createElement('input');input.type='file';input.accept='image/*';input.capture='environment';input.onchange=()=>alert('Introduce el ISBN manualmente por ahora.');input.click()}
+async function lookupISBN(isbn){
+  const clean=isbn.replace(/\D/g,'');if(clean.length<10)return;
+  const res=document.getElementById('isbn-result');res.innerHTML='<div class="loading">Buscando...</div>';
+  try{
+    // Try Google Books first (better cover images)
+    const gr=await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${clean}&maxResults=1`);
+    if(gr.ok){const gd=await gr.json();const info=gd.items?.[0]?.volumeInfo;
+      if(info){const cover=fixUrl(info.imageLinks?.thumbnail||'');const title=info.title||''  ;const author=(info.authors||[])[0]||''  ;const year=(info.publishedDate||'').slice(0,4);
+        res.innerHTML=`<div class="bcard" style="margin-bottom:12px"><div style="width:42px;height:60px;border-radius:2px;overflow:hidden;border:1px solid var(--border)">${cover?`<img src="${cover}" style="width:42px;height:60px;object-fit:cover">`:`<div style="width:42px;height:60px;display:flex;align-items:center;justify-content:center;background:var(--s2);font-size:18px">📖</div>`}</div><div class="binfo"><div class="btitle">${title}</div><div class="bauthor">${author}</div></div></div><button class="mbtn" onclick="saveISBN('${esc(title)}','${esc(author)}','${cover}','${year}','${clean}','${(info.categories||[])[0]||''}','${info.publisher||''}','${info.language||''}',${info.pageCount||0})">Añadir a mi biblioteca</button>`;
+        return;
+      }
+    }
+    // Fallback Open Library
+    const r=await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${clean}&format=json&jscmd=data`);
+    const d=await r.json();const key=Object.keys(d)[0];
+    if(!key){res.innerHTML='<div style="text-align:center;padding:12px;color:var(--muted);font-size:13px;font-style:italic">No encontrado.</div>';return}
+    const book=d[key];const cover=book.cover?.medium||book.cover?.small||''  ;const title=book.title||''  ;const author=(book.authors||[])[0]?.name||''  ;const year=(book.publish_date||'').slice(-4);
+    res.innerHTML=`<div class="bcard" style="margin-bottom:12px"><div style="width:42px;height:60px;border-radius:2px;overflow:hidden;border:1px solid var(--border)">${cover?`<img src="${fixUrl(cover)}" style="width:42px;height:60px;object-fit:cover">`:`<div style="width:42px;height:60px;display:flex;align-items:center;justify-content:center;background:var(--s2);font-size:18px">📖</div>`}</div><div class="binfo"><div class="btitle">${title}</div><div class="bauthor">${author}</div></div></div><button class="mbtn" onclick="saveISBN('${esc(title)}','${esc(author)}','${fixUrl(cover)}','${year}','${clean}','','','',0)">Añadir a mi biblioteca</button>`;
+  }catch(e){res.innerHTML='<div style="text-align:center;padding:12px;color:#a05050;font-size:13px">Error. Intenta de nuevo.</div>'}
+}
+function saveISBN(title,author,cover,year,isbn,genre,publisher,language,pages){
+  const books=DB.books;
+  books.push({id:uid(),title,author,cover,year,isbn,genre,publisher,language,totalPages:pages||0,currentPage:0,status:'pendiente'  ,notes:'',rating:0,loaned:false,addedAt:Date.now()});
+  DB.books=books;closeAdd();renderBiblioteca();renderStats();
+}
+function closeAdd(){document.getElementById('add-modal').style.display='none';_gbSel=null}
+
+// ── SYNOPSIS / BIO ────────────────────────
+async function showSynopsis(title,author){
+  document.getElementById('i-title').textContent=title;
+  document.getElementById('i-body').innerHTML='<div class="loading">Buscando sinopsis...</div>';
+  document.getElementById('imodal').style.display='flex';
+  try{
+    const r=await fetch(`https://www.googleapis.com/books/v1/volumes?q=intitle:${encodeURIComponent(title)}+inauthor:${encodeURIComponent((author||''). split(' ').pop())}&maxResults=1`);
+    const d=await r.json();const info=d.items?.[0]?.volumeInfo;
+    let h=''  ;
+    if(info?.imageLinks?.thumbnail)h+=`<img src="${fixUrl(info.imageLinks.thumbnail).replace('zoom=3','zoom=5')}" style="float:right;width:80px;border-radius:3px;margin:0 0 10px 12px;border:1px solid var(--border);box-shadow:2px 2px 8px rgba(0,0,0,.4)">`;
+    if(info?.description)h+=`<div class="ibio-text">${info.description}</div>`;
+    else{const wr=await fetch(`https://es.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title.replace(/ /g,'_'))}`);if(wr.ok){const wd=await wr.json();if(wd.extract&&!wd.type?.includes('disambig'))h+=`<div class="ibio-text">${wd.extract}</div>`;else h+='<div class="ibio-text">Sinopsis no disponible.</div>'}}
+    const q=encodeURIComponent(title+' '+author);
+    h+=`<div class="ibio-links"><a class="ilink" href="https://www.goodreads.com/search?q=${q}" target="_blank">Goodreads ↗</a><a class="ilink" href="https://openlibrary.org/search?q=${encodeURIComponent(title)}" target="_blank">Open Library ↗</a><a class="ilink" href="https://es.wikipedia.org/wiki/${encodeURIComponent(title.replace(/ /g,'_'))}" target="_blank">Wikipedia ↗</a></div>`;
+    document.getElementById('i-body').innerHTML=h;
+  }catch(e){document.getElementById('i-body').innerHTML='<div class="ibio-text">No se pudo cargar.</div>'}
+}
+async function showAuthor(author){
+  if(!author)return;
+  document.getElementById('i-title').textContent=author;
+  document.getElementById('i-body').innerHTML='<div class="loading">Buscando en los anales...</div>';
+  document.getElementById('imodal').style.display='flex';
+  try{
+    const wq=encodeURIComponent(author.replace(/ /g,'_'));
+    let bio=''  ,photo=''  ;
+    const r=await fetch(`https://es.wikipedia.org/api/rest_v1/page/summary/${wq}`);
+    if(r.ok){const d=await r.json();if(d.extract&&!d.type?.includes('disambig')){bio=d.extract;photo=d.thumbnail?.source||''}}
+    if(!bio){const re=await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${wq}`);if(re.ok){const de=await re.json();if(de.extract){photo=de.thumbnail?.source||''  ;const tr=await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(de.extract.slice(0,600))}&langpair=en|es`);const td=await tr.json();bio=td.responseData?.translatedText||de.extract}}}
+    const br=await fetch(`https://www.googleapis.com/books/v1/volumes?q=inauthor:${encodeURIComponent(author)}&maxResults=6&orderBy=relevance`);
+    const bd=await br.json();const biblio=(bd.items||[]).map(i=>i.volumeInfo.title).filter(Boolean);
+    let h=''  ;
+    if(photo)h+=`<img class="ibio-photo" src="${photo}">`;
+    h+=bio?`<div class="ibio-text">${bio}</div>`:'<div class="ibio-text">Biografía no disponible.</div>'  ;
+    if(biblio.length)h+=`<div style="margin-top:14px;clear:both"><div class="dsec" style="margin-top:0">Bibliografía</div>${biblio.map(t=>`<div style="font-size:12px;padding:5px 0;border-bottom:1px solid var(--border);color:rgba(232,223,200,.65);font-style:italic">${t}</div>`).join('')}</div>`;
+    h+=`<div class="ibio-links" style="margin-top:12px;clear:both"><a class="ilink" href="https://es.wikipedia.org/wiki/${wq}" target="_blank">Wikipedia ↗</a><a class="ilink" href="https://www.goodreads.com/search?q=${encodeURIComponent(author)}" target="_blank">Goodreads ↗</a></div>`;
+    document.getElementById('i-body').innerHTML=h;
+  }catch(e){document.getElementById('i-body').innerHTML='<div class="ibio-text">No se pudo cargar.</div>'}
+}
+function closeInfo(){document.getElementById('imodal').style.display='none'}
+
+// ── SAMPLE DATA ───────────────────────────
+if(!DB.books.length){
+  DB.books=[
+    {id:uid(),title:'El nombre de la rosa',author:'Umberto Eco',genre:'Novela histórica',year:'1980',status:'leido',cover:'',rating:5,notes:'La biblioteca secreta como metáfora del conocimiento prohibido.',loaned:true,addedAt:Date.now()-864e5*60,finishedYear:2024,publisher:'Lumen',language:'it',isbn:'',totalPages:592,currentPage:0},
+    {id:uid(),title:'2010: Odisea Dos',author:'Arthur C. Clarke',genre:'Ciencia ficción',year:'1982',status:'leyendo',cover:'',rating:0,notes:'La rehabilitación de HAL es lo más interesante.',loaned:false,addedAt:Date.now()-864e5*5,publisher:'Minotauro',language:'en',isbn:'',totalPages:368,currentPage:187},
+    {id:uid(),title:'Elegidos para la gloria',author:'Tom Wolfe',genre:'No ficción',year:'1979',status:'pendiente',cover:'',rating:0,notes:'',loaned:false,addedAt:Date.now()-864e5*3,publisher:'Anagrama',language:'en',isbn:'',totalPages:496,currentPage:0},
+    {id:uid(),title:'El jugador de ajedrez',author:'Stefan Zweig',genre:'Narrativa',year:'1943',status:'leido',cover:'',rating:5,notes:'',loaned:false,addedAt:Date.now()-864e5*20,finishedYear:2024,publisher:'Acantilado',language:'de',isbn:'',totalPages:96,currentPage:0},
+    {id:uid(),title:'Solaris',author:'Stanisław Lem',genre:'Ciencia ficción',year:'1961',status:'leido',cover:'',rating:4,notes:'El extraterrestre más honesto de la CF.',loaned:false,addedAt:Date.now()-864e5*30,finishedYear:2024,publisher:'Impedimenta',language:'pl',isbn:'',totalPages:256,currentPage:0},
+  ];
+  DB.loans=[{id:uid(),bookId:DB.books[0].id,person:'Marcos',date:Date.now()-864e5*45,returned:false}];
+}
+renderStats();renderBiblioteca();
+</script>
+</body>
+</html>
