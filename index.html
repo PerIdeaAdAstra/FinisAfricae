@@ -266,7 +266,7 @@ const DB={
   set loans(v){localStorage.setItem('fa-loans',JSON.stringify(v))},
 };
 let currentTab='biblioteca',searchQ='',currentBookId=null;
-let activeFilters={status:null,author:null,genre:null,year:null};
+let activeFilters={status:null,author:null,genre:null,year:null,rating:null,language:null,publisher:null,pages:null,decade:null};
 
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2)}
 function stars(n,max=5){return'★'.repeat(n)+'☆'.repeat(max-n)}
@@ -282,9 +282,17 @@ function esc(s){return(s||''). replace(/'/g,"\'").replace(/"/g,'&quot;')}
 
 // ── FILTER BAR ────────────────────────────
 function getActiveFilterCount(){return Object.values(activeFilters).filter(Boolean).length}
+const FILTER_LABELS={status:'',author:'',genre:'',year:'Año ',rating:'',language:'Idioma: ',publisher:'',pages:'',decade:''};
+function filterChipLabel(key,val){
+  if(key==='rating')return stars(parseInt(val))+' estrellas';
+  if(key==='decade')return val+'s';
+  if(key==='pages')return val+' págs.';
+  if(key==='year')return 'Año '+val;
+  return val;
+}
 function renderFilterBar(){
   const fb=document.getElementById('fbar');
-  const chips=Object.entries(activeFilters).filter(([k,v])=>v).map(([k,v])=>`<div class="fbar-chip">${v}<button onclick="clearFilter('${k}')" title="Quitar filtro">×</button></div>`);
+  const chips=Object.entries(activeFilters).filter(([k,v])=>v).map(([k,v])=>`<div class="fbar-chip">${filterChipLabel(k,v)}<button onclick="clearFilter('${k}')" title="Quitar filtro">×</button></div>`);
   if(!chips.length){fb.style.display='none';return}
   fb.style.display='flex';
   fb.innerHTML=chips.join('')+`<div class="fbar-chip" style="background:none;border-color:var(--border);color:var(--muted)" onclick="clearAllFilters()">Limpiar todo</div>`;
@@ -319,6 +327,15 @@ function setNav(el){document.querySelectorAll('.bitem').forEach(b=>b.classList.r
 function doSearch(q){searchQ=q.toLowerCase();if(currentTab==='biblioteca')renderBiblioteca()}
 
 // ── BIBLIOTECA ────────────────────────────
+function getDecade(year){if(!year)return null;return Math.floor(parseInt(year)/10)*10;}
+function getPageRange(pages){
+  const p=parseInt(pages)||0;
+  if(!p)return null;
+  if(p<200)return'< 200';
+  if(p<350)return'200-350';
+  if(p<500)return'350-500';
+  return'500+';
+}
 function applyFilters(books){
   let r=books;
   if(searchQ)r=r.filter(b=>b.title?.toLowerCase().includes(searchQ)||b.author?.toLowerCase().includes(searchQ)||b.genre?.toLowerCase().includes(searchQ));
@@ -327,6 +344,11 @@ function applyFilters(books){
   if(activeFilters.author)r=r.filter(b=>b.author===activeFilters.author);
   if(activeFilters.genre)r=r.filter(b=>b.genre===activeFilters.genre);
   if(activeFilters.year)r=r.filter(b=>b.year==activeFilters.year);
+  if(activeFilters.rating)r=r.filter(b=>(b.rating||0)===parseInt(activeFilters.rating));
+  if(activeFilters.language)r=r.filter(b=>b.language===activeFilters.language);
+  if(activeFilters.publisher)r=r.filter(b=>b.publisher===activeFilters.publisher);
+  if(activeFilters.pages)r=r.filter(b=>getPageRange(b.totalPages)===activeFilters.pages);
+  if(activeFilters.decade)r=r.filter(b=>getDecade(b.year)==activeFilters.decade);
   return r;
 }
 
@@ -379,24 +401,34 @@ async function renderRecomendaciones(){
   const el=document.getElementById('content');
   el.innerHTML='<div class="loading">Buscando en los anales...</div>';
   const books=DB.books;const read=books.filter(b=>b.status==='leido');
-  if(read.length<2){el.innerHTML='<div class="empty"><div class="empty-icon">✨</div><div class="empty-text">Lee al menos 2 libros para recibir recomendaciones.<br><br>Asegúrate de que tienen género asignado.</div></div>';return}
-  const genres=[...new Set(read.map(b=>b.genre).filter(Boolean))];
-  const authors=[...new Set(read.map(b=>b.author).filter(Boolean))];
+  if(read.length<2){el.innerHTML='<div class="empty"><div class="empty-icon">✨</div><div class="empty-text">Lee al menos 2 libros para recibir recomendaciones.</div></div>';return}
+
+  // Rank authors by frequency (most-read first), fall back to genres if present
+  const authorCounts={};read.forEach(b=>{if(b.author)authorCounts[b.author]=(authorCounts[b.author]||0)+1;});
+  const topAuthors=Object.entries(authorCounts).sort((a,b)=>b[1]-a[1]).map(([a])=>a);
+  const genreCounts={};read.forEach(b=>{if(b.genre)genreCounts[b.genre]=(genreCounts[b.genre]||0)+1;});
+  const topGenres=Object.entries(genreCounts).sort((a,b)=>b[1]-a[1]).map(([g])=>g);
+
+  // Prefer genres if available (more diverse recs), else use top authors
+  const queries=topGenres.length?[...topGenres.slice(0,2),...topAuthors.slice(0,2)]:topAuthors.slice(0,4);
   const owned=new Set(books.map(b=>b.title?.toLowerCase()));
   let recs=[];
-  for(const q of [...genres.slice(0,2),...authors.slice(0,2)].slice(0,3)){
+  for(const q of queries.slice(0,4)){
     try{
-      const r=await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=5&orderBy=relevance`);
-      if(!r.ok)continue;const d=await r.json();
-      (d.items||[]).forEach(item=>{
-        const info=item.volumeInfo;const title=info.title;
-        if(!title||owned.has(title.toLowerCase())||recs.find(x=>x.title===title))return;
-        recs.push({title,author:(info.authors||[])[0]||'',cover:fixUrl(info.imageLinks?.thumbnail||''),reason:`Por tu interés en "${q}"`});
-      });
+      // Open Library first — no rate limit
+      const r=await fetch(`https://openlibrary.org/search.json?${topAuthors.includes(q)?'author':'q'}=${encodeURIComponent(q)}&limit=6&fields=title,author_name,cover_i,first_publish_year`);
+      if(r.ok){
+        const d=await r.json();
+        (d.docs||[]).forEach(doc=>{
+          const title=doc.title;
+          if(!title||owned.has(title.toLowerCase())||recs.find(x=>x.title===title))return;
+          recs.push({title,author:(doc.author_name||[])[0]||'',cover:doc.cover_i?`https://covers.openlibrary.org/b/id/${doc.cover_i}-M.jpg`:'',reason:`Por tu interés en "${q}"`});
+        });
+      }
     }catch(e){}
   }
   recs=recs.slice(0,8);
-  if(!recs.length){el.innerHTML='<div class="empty"><div class="empty-icon">✨</div><div class="empty-text">Añade libros con género para recibir recomendaciones.</div></div>';return}
+  if(!recs.length){el.innerHTML='<div class="empty"><div class="empty-icon">✨</div><div class="empty-text">No se encontraron recomendaciones por ahora.<br>Vuelve a intentarlo más tarde.</div></div>';return}
   let h=`<div class="slabel">${recs.length} recomendaciones</div>`;
   recs.forEach(rec=>{
     const q=encodeURIComponent(rec.title+' '+rec.author);
@@ -548,9 +580,11 @@ function renderDetail(book){
   <div class="dinfo-row"><span>Autor</span><input value="${book.author||''}" placeholder="Autor" onchange="setField('${book.id}','author',this.value)"></div>
   <div class="dinfo-row"><span>Año</span><input value="${book.year||''}" placeholder="Año" type="number" onchange="setField('${book.id}','year',this.value)"></div>
   <div class="dinfo-row"><span>Género</span><input value="${book.genre||''}" placeholder="Género" onchange="setField('${book.id}','genre',this.value)"></div>
-  <div class="dinfo-row"><span>Editorial</span><input value="${book.publisher||''}" placeholder="Editorial" onchange="setField('${book.id}','publisher',this.value)"></div>
-  <div class="dinfo-row"><span>Idioma original</span><input value="${book.language||''}" placeholder="Idioma" onchange="setField('${book.id}','language',this.value)"></div>
-  <div class="dinfo-row"><span>Páginas</span><input value="${book.totalPages||''}" placeholder="Páginas" type="number" onchange="setTotal('${book.id}',this.value)"></div>
+  <div class="dinfo-row"><span style="${book.publisher?'cursor:pointer;color:var(--gold)':''}" ${book.publisher?`onclick="setFilter('publisher','${esc(book.publisher)}');closeDetail()"`:''}>Editorial</span><input value="${book.publisher||''}" placeholder="Editorial" onchange="setField('${book.id}','publisher',this.value)"></div>
+  <div class="dinfo-row"><span style="${book.language?'cursor:pointer;color:var(--gold)':''}" ${book.language?`onclick="setFilter('language','${esc(book.language)}');closeDetail()"`:''}>Idioma original</span><input value="${book.language||''}" placeholder="Idioma" onchange="setField('${book.id}','language',this.value)"></div>
+  <div class="dinfo-row"><span style="${book.totalPages?'cursor:pointer;color:var(--gold)':''}" ${book.totalPages?`onclick="setFilter('pages','${getPageRange(book.totalPages)}');closeDetail()"`:''}>Páginas</span><input value="${book.totalPages||''}" placeholder="Páginas" type="number" onchange="setTotal('${book.id}',this.value)"></div>
+  <div class="dinfo-row"><span style="${book.rating?'cursor:pointer;color:var(--gold)':''}" ${book.rating?`onclick="setFilter('rating','${book.rating}');closeDetail()"`:''}>Valoración</span><span style="color:var(--gold);font-family:var(--font)">${book.rating?stars(book.rating):'—'}</span></div>
+  <div class="dinfo-row"><span style="${book.year?'cursor:pointer;color:var(--gold)':''}" ${book.year?`onclick="setFilter('decade','${getDecade(book.year)}');closeDetail()"`:''}>Década</span><span style="color:var(--text);font-family:var(--mono);font-size:12px">${book.year?getDecade(book.year)+'s':'—'}</span></div>
   <div class="dinfo-row"><span>ISBN</span><input value="${book.isbn||''}" placeholder="ISBN" onchange="setField('${book.id}','isbn',this.value)"></div>
   <div class="dinfo-row"><span>Préstamo biblioteca</span><div style="display:flex;gap:6px"><div class="mopt${book.fromLibrary?' on':''}" style="padding:3px 9px;font-size:9px" onclick="toggleLibrary('${book.id}',this)">${book.fromLibrary?'✓ Sí':'No'}</div></div></div>
   ${book.fromLibrary?`<div class="dinfo-row"><span>Fecha devolución</span><input type="date" value="${book.dueDate||''}" onchange="setField('${book.id}','dueDate',this.value)"></div>`:''}
