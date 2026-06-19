@@ -455,8 +455,46 @@ function renderEstadisticas(){
   h+=`<div class="slabel" style="margin-top:20px">Copia de seguridad</div><div style="display:flex;gap:8px;margin-bottom:10px"><button onclick="exportData()" style="flex:1;padding:10px;border-radius:2px;border:1px solid var(--gold2);background:rgba(200,169,110,.08);color:var(--gold);font-family:var(--mono);font-size:10px;cursor:pointer;letter-spacing:.5px">📥 Exportar</button><label style="flex:1;padding:10px;border-radius:2px;border:1px solid var(--border);background:var(--s2);color:var(--muted);font-family:var(--mono);font-size:10px;cursor:pointer;text-align:center;display:flex;align-items:center;justify-content:center;letter-spacing:.5px">📤 Importar<input type="file" accept=".json" onchange="importData(this)" style="display:none"></label></div><div style="font-size:11px;color:var(--muted);line-height:1.6;background:var(--s2);border-radius:2px;padding:10px;border:1px solid var(--border);">Exporta para guardar una copia. Importa para restaurar en otro dispositivo.</div>
   <div class="slabel" style="margin-top:18px">Importar desde Goodreads</div>
   <label style="display:block;padding:10px;border-radius:2px;border:1px dashed var(--gold2);background:rgba(200,169,110,.05);color:var(--gold);font-family:var(--mono);font-size:10px;cursor:pointer;text-align:center;letter-spacing:.5px;margin-bottom:8px">📚 Subir CSV de Goodreads<input type="file" accept="text/csv" onchange="importGoodreads(this)" style="display:none"></label>
-  <div style="font-size:11px;color:var(--muted);line-height:1.7;background:var(--s2);border-radius:2px;padding:10px;border:1px solid var(--border)">Goodreads → Mis libros → Herramientas → Importar/Exportar → Exportar biblioteca. Sube el CSV descargado aquí.</div>`;
+  <div style="font-size:11px;color:var(--muted);line-height:1.7;background:var(--s2);border-radius:2px;padding:10px;border:1px solid var(--border)">Goodreads → Mis libros → Herramientas → Importar/Exportar → Exportar biblioteca. Sube el CSV descargado aquí.</div>
+  <div class="slabel" style="margin-top:18px">Portadas faltantes</div>
+  <button onclick="fetchAllMissingCovers()" id="bulk-cover-btn" style="width:100%;padding:10px;border-radius:2px;border:1px solid var(--gold2);background:rgba(200,169,110,.08);color:var(--gold);font-family:var(--mono);font-size:10px;cursor:pointer;letter-spacing:.5px">🖼 Completar portadas faltantes (${books.filter(b=>!b.cover).length})</button>
+  <div id="bulk-cover-progress" style="font-size:11px;color:var(--muted);margin-top:8px;text-align:center"></div>`;
   el.innerHTML=h;
+}
+let _bulkCoverRunning=false;
+async function fetchAllMissingCovers(){
+  if(_bulkCoverRunning)return;
+  _bulkCoverRunning=true;
+  const btn=document.getElementById('bulk-cover-btn');
+  const prog=document.getElementById('bulk-cover-progress');
+  const missing=DB.books.filter(b=>!b.cover);
+  if(!missing.length){if(btn)btn.textContent='✓ Todas las portadas completas';_bulkCoverRunning=false;return}
+  let done=0,found=0;
+  for(const book of missing){
+    if(prog)prog.textContent=`Buscando ${done+1} de ${missing.length}... (${found} encontradas)`;
+    try{
+      let cover='';
+      if(book.isbn){
+        const r=await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${book.isbn}&format=json&jscmd=data`);
+        if(r.ok){const d=await r.json();const key=Object.keys(d)[0];if(key)cover=d[key].cover?.medium||'';}
+      }
+      if(!cover){
+        const r=await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(book.title+' '+(book.author||''))}&limit=1&fields=cover_i`);
+        if(r.ok){const d=await r.json();const doc=d.docs?.[0];if(doc?.cover_i)cover=`https://covers.openlibrary.org/b/id/${doc.cover_i}-M.jpg`;}
+      }
+      if(cover){
+        const books=DB.books;const b=books.find(x=>x.id===book.id);
+        if(b){b.cover=cover;DB.books=books;found++;}
+      }
+    }catch(e){}
+    done++;
+    // Small delay to be polite to the API
+    await new Promise(r=>setTimeout(r,200));
+  }
+  if(prog)prog.textContent=`✓ Completado: ${found} de ${missing.length} portadas encontradas.`;
+  _bulkCoverRunning=false;
+  renderBiblioteca();
+  setTimeout(()=>renderEstadisticas(),1500);
 }
 function exportData(){
   const data={version:1,exported:new Date().toISOString(),books:DB.books,loans:DB.loans};
@@ -554,7 +592,64 @@ function openDetail(id){
   const book=DB.books.find(b=>b.id===id);if(!book)return;
   currentBookId=id;document.getElementById('d-head-title').textContent=book.title;
   renderDetail(book);document.getElementById('dmodal').classList.add('show');
+  if(!book.cover)fetchMissingCover(id);
 }
+async function fetchMissingCover(id){
+  const book=DB.books.find(b=>b.id===id);if(!book||book.cover)return;
+  try{
+    // Try Open Library first
+    let cover='';
+    if(book.isbn){
+      const r=await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${book.isbn}&format=json&jscmd=data`);
+      if(r.ok){const d=await r.json();const key=Object.keys(d)[0];if(key)cover=d[key].cover?.medium||d[key].cover?.large||'';}
+    }
+    if(!cover){
+      const r=await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(book.title+' '+(book.author||''))}&limit=1&fields=cover_i`);
+      if(r.ok){const d=await r.json();const doc=d.docs?.[0];if(doc?.cover_i)cover=`https://covers.openlibrary.org/b/id/${doc.cover_i}-M.jpg`;}
+    }
+    if(!cover){
+      // Fallback Google Books
+      try{
+        const r=await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(book.title+' '+(book.author||''))}&maxResults=1`);
+        if(r.ok){const d=await r.json();cover=fixUrl(d.items?.[0]?.volumeInfo?.imageLinks?.thumbnail||'');}
+      }catch(e){}
+    }
+    if(cover){
+      const books=DB.books;const b=books.find(x=>x.id===id);
+      if(b){b.cover=cover;DB.books=books;}
+      if(currentBookId===id){renderDetail(b);}
+      renderBiblioteca();
+    }
+  }catch(e){}
+}
+// ── INFO ROW: clickable filter + edit toggle ──
+function infoRow(label,value,field,bookId,filterKey,filterVal,inputType){
+  const hasValue=value!==null&&value!==undefined&&value!=='';
+  const clickAttr=(hasValue&&filterKey)?`onclick="setFilter('${filterKey}','${String(filterVal).replace(/'/g,"\\'")}');closeDetail()" style="cursor:pointer;color:var(--gold)"`:'';
+  return`<div class="dinfo-row" id="row-${field}-${bookId}">
+    <span>${label}</span>
+    <span style="display:flex;align-items:center;gap:6px">
+      <span ${clickAttr}>${hasValue?value:'—'}</span>
+      <button onclick="event.stopPropagation();editField('${bookId}','${field}','${label}')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:11px;padding:2px" title="Editar">✎</button>
+    </span>
+  </div>`;
+}
+function editField(bookId,field,label){
+  const row=document.getElementById(`row-${field}-${bookId}`);
+  if(!row)return;
+  const book=DB.books.find(b=>b.id===bookId);
+  const val=book?.[field]||'';
+  const type=field==='year'||field==='totalPages'?'number':'text';
+  row.innerHTML=`<input value="${val}" type="${type}" placeholder="${label}" autofocus style="width:100%;background:rgba(0,0,0,.3);border:1px solid var(--gold2);border-radius:2px;padding:6px 8px;color:var(--text);font-size:12px;font-family:var(--mono);outline:none" onblur="saveFieldEdit('${bookId}','${field}',this.value)" onkeydown="if(event.key==='Enter')this.blur()">`;
+  row.querySelector('input').focus();
+}
+function saveFieldEdit(bookId,field,val){
+  if(field==='totalPages')setTotal(bookId,val);
+  else setField(bookId,field,val);
+  const book=DB.books.find(b=>b.id===bookId);
+  if(book)renderDetail(book);
+}
+
 function renderDetail(book){
   const loan=DB.loans.find(l=>l.bookId===book.id&&!l.returned);
   const pct=book.totalPages?Math.round((book.currentPage||0)/book.totalPages*100):0;
@@ -577,15 +672,15 @@ function renderDetail(book){
   <div class="dsec">Notas</div>
   <textarea class="dnote" placeholder="Reflexiones, frases memorables, opinión..." onchange="setField('${book.id}','notes',this.value)">${book.notes||''}</textarea>
   <div class="dsec">Información</div>
-  <div class="dinfo-row"><span>Autor</span><input value="${book.author||''}" placeholder="Autor" onchange="setField('${book.id}','author',this.value)"></div>
-  <div class="dinfo-row"><span>Año</span><input value="${book.year||''}" placeholder="Año" type="number" onchange="setField('${book.id}','year',this.value)"></div>
-  <div class="dinfo-row"><span>Género</span><input value="${book.genre||''}" placeholder="Género" onchange="setField('${book.id}','genre',this.value)"></div>
-  <div class="dinfo-row"><span style="${book.publisher?'cursor:pointer;color:var(--gold)':''}" ${book.publisher?`onclick="setFilter('publisher','${esc(book.publisher)}');closeDetail()"`:''}>Editorial</span><input value="${book.publisher||''}" placeholder="Editorial" onchange="setField('${book.id}','publisher',this.value)"></div>
-  <div class="dinfo-row"><span style="${book.language?'cursor:pointer;color:var(--gold)':''}" ${book.language?`onclick="setFilter('language','${esc(book.language)}');closeDetail()"`:''}>Idioma original</span><input value="${book.language||''}" placeholder="Idioma" onchange="setField('${book.id}','language',this.value)"></div>
-  <div class="dinfo-row"><span style="${book.totalPages?'cursor:pointer;color:var(--gold)':''}" ${book.totalPages?`onclick="setFilter('pages','${getPageRange(book.totalPages)}');closeDetail()"`:''}>Páginas</span><input value="${book.totalPages||''}" placeholder="Páginas" type="number" onchange="setTotal('${book.id}',this.value)"></div>
-  <div class="dinfo-row"><span style="${book.rating?'cursor:pointer;color:var(--gold)':''}" ${book.rating?`onclick="setFilter('rating','${book.rating}');closeDetail()"`:''}>Valoración</span><span style="color:var(--gold);font-family:var(--font)">${book.rating?stars(book.rating):'—'}</span></div>
-  <div class="dinfo-row"><span style="${book.year?'cursor:pointer;color:var(--gold)':''}" ${book.year?`onclick="setFilter('decade','${getDecade(book.year)}');closeDetail()"`:''}>Década</span><span style="color:var(--text);font-family:var(--mono);font-size:12px">${book.year?getDecade(book.year)+'s':'—'}</span></div>
-  <div class="dinfo-row"><span>ISBN</span><input value="${book.isbn||''}" placeholder="ISBN" onchange="setField('${book.id}','isbn',this.value)"></div>
+  ${infoRow('Autor',book.author,'author',book.id,'author',book.author,'text')}
+  ${infoRow('Año',book.year,'year',book.id,'year',book.year,'number')}
+  ${infoRow('Género',book.genre,'genre',book.id,'genre',book.genre,'text')}
+  ${infoRow('Editorial',book.publisher,'publisher',book.id,'publisher',book.publisher,'text')}
+  ${infoRow('Idioma original',book.language,'language',book.id,'language',book.language,'text')}
+  ${infoRow('Páginas',book.totalPages,'totalPages',book.id,'pages',getPageRange(book.totalPages),'number')}
+  <div class="dinfo-row"><span>Valoración</span><span style="color:var(--gold);font-family:var(--font);cursor:${book.rating?'pointer':'default'}" onclick="${book.rating?`setFilter('rating','${book.rating}');closeDetail()`:''}">${book.rating?stars(book.rating):'—'}</span></div>
+  <div class="dinfo-row"><span>Década</span><span style="color:var(--text);font-family:var(--mono);font-size:12px;cursor:${book.year?'pointer':'default'}" onclick="${book.year?`setFilter('decade','${getDecade(book.year)}');closeDetail()`:''}">${book.year?getDecade(book.year)+'s':'—'}</span></div>
+  ${infoRow('ISBN',book.isbn,'isbn',book.id,null,null,'text')}
   <div class="dinfo-row"><span>Préstamo biblioteca</span><div style="display:flex;gap:6px"><div class="mopt${book.fromLibrary?' on':''}" style="padding:3px 9px;font-size:9px" onclick="toggleLibrary('${book.id}',this)">${book.fromLibrary?'✓ Sí':'No'}</div></div></div>
   ${book.fromLibrary?`<div class="dinfo-row"><span>Fecha devolución</span><input type="date" value="${book.dueDate||''}" onchange="setField('${book.id}','dueDate',this.value)"></div>`:''}
   <div class="dsec">Acciones</div>
