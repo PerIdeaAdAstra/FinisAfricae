@@ -177,9 +177,9 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 @media(max-width:480px){.fab{right:16px}}
 .bnav{position:sticky;bottom:0;display:flex;background:rgba(10,8,5,.97);border-top:1px solid var(--border);padding:5px 0 4px;flex-shrink:0;z-index:30;position:relative}
 .bnav::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold2),transparent);opacity:.4}
-.bitem{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:8px;color:var(--muted);cursor:pointer;padding:4px;font-family:var(--mono);letter-spacing:.5px;text-transform:uppercase;transition:color .15s}
+.bitem{flex:1;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--muted);cursor:pointer;padding:4px;font-family:var(--mono);letter-spacing:.5px;text-transform:uppercase;transition:color .15s}
 .bitem.on{color:var(--gold)}
-.bitem-icon{font-size:18px}
+
 .loading{text-align:center;padding:20px;color:var(--muted);font-size:13px;}
 .prog-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .prog-input{width:68px;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:2px;padding:6px 8px;color:var(--text);font-size:12px;font-family:var(--mono);outline:none;text-align:center}
@@ -221,10 +221,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
   <div class="content" id="content"></div>
   <button class="fab" onclick="openAdd('manual')">+</button>
   <div class="bnav">
-    <div class="bitem on" onclick="setTab('biblioteca',null);setNav(this)"><div class="bitem-icon">📚</div>Biblioteca</div>
-    <div class="bitem" onclick="setTab('prestamos',null);setNav(this)"><div class="bitem-icon">🤝</div>Préstamos</div>
-    <div class="bitem" onclick="setTab('recomendaciones',null);setNav(this)"><div class="bitem-icon">✨</div>Para ti</div>
-    <div class="bitem" onclick="setTab('estadisticas',null);setNav(this)"><div class="bitem-icon">📊</div>Stats</div>
+    <div class="bitem on" onclick="setTab('biblioteca',null);setNav(this)">Biblioteca</div>
+    <div class="bitem" onclick="setTab('prestamos',null);setNav(this)">Préstamos</div>
+    <div class="bitem" onclick="setTab('recomendaciones',null);setNav(this)">Para ti</div>
+    <div class="bitem" onclick="setTab('estadisticas',null);setNav(this)">Stats</div>
   </div>
 </div>
 
@@ -422,7 +422,7 @@ function renderEstadisticas(){
   if(ta.length){h+='<div class="slabel">Autores</div>';const mx=ta[0][1];ta.forEach(([a,n])=>{h+=`<div class="sbar-wrap"><div class="sbar-label"><span style="cursor:pointer;color:var(--gold)" onclick="setFilter('author','${esc(a)}');setTab('biblioteca',null)">${a}</span><span style="color:var(--muted)">${n}</span></div><div class="sbar-track"><div class="sbar-fill" style="width:${Math.round(n/mx*100)}%;background:linear-gradient(90deg,var(--gold2),var(--gold))"></div></div></div>`})}
   h+=`<div class="slabel" style="margin-top:20px">Copia de seguridad</div><div style="display:flex;gap:8px;margin-bottom:10px"><button onclick="exportData()" style="flex:1;padding:10px;border-radius:2px;border:1px solid var(--gold2);background:rgba(200,169,110,.08);color:var(--gold);font-family:var(--mono);font-size:10px;cursor:pointer;letter-spacing:.5px">📥 Exportar</button><label style="flex:1;padding:10px;border-radius:2px;border:1px solid var(--border);background:var(--s2);color:var(--muted);font-family:var(--mono);font-size:10px;cursor:pointer;text-align:center;display:flex;align-items:center;justify-content:center;letter-spacing:.5px">📤 Importar<input type="file" accept=".json" onchange="importData(this)" style="display:none"></label></div><div style="font-size:11px;color:var(--muted);line-height:1.6;background:var(--s2);border-radius:2px;padding:10px;border:1px solid var(--border);">Exporta para guardar una copia. Importa para restaurar en otro dispositivo.</div>
   <div class="slabel" style="margin-top:18px">Importar desde Goodreads</div>
-  <label style="display:block;padding:10px;border-radius:2px;border:1px dashed var(--gold2);background:rgba(200,169,110,.05);color:var(--gold);font-family:var(--mono);font-size:10px;cursor:pointer;text-align:center;letter-spacing:.5px;margin-bottom:8px">📚 Subir CSV de Goodreads<input type="file" accept=".csv,text/csv,text/plain,application/vnd.ms-excel" onchange="importGoodreads(this)" style="display:none"></label>
+  <label style="display:block;padding:10px;border-radius:2px;border:1px dashed var(--gold2);background:rgba(200,169,110,.05);color:var(--gold);font-family:var(--mono);font-size:10px;cursor:pointer;text-align:center;letter-spacing:.5px;margin-bottom:8px">📚 Subir CSV de Goodreads<input type="file" onchange="importGoodreads(this)" style="display:none"></label>
   <div style="font-size:11px;color:var(--muted);line-height:1.7;background:var(--s2);border-radius:2px;padding:10px;border:1px solid var(--border)">Goodreads → Mis libros → Herramientas → Importar/Exportar → Exportar biblioteca. Sube el CSV descargado aquí.</div>`;
   el.innerHTML=h;
 }
@@ -470,8 +470,10 @@ function parseCSV(text){
   });
 }
 function importGoodreads(input){
-  const file=input.files[0];if(!file)return;
+  const file=input.files[0];
+  if(!file){alert('No se ha seleccionado ningún archivo. Inténtalo de nuevo.');return;}
   const reader=new FileReader();
+  reader.onerror=()=>alert('Error al leer el archivo.');
   reader.onload=e=>{
     try{
       const rows=parseCSV(e.target.result);
