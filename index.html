@@ -619,6 +619,7 @@ function renderManual(){
   <button class="mbtn-sec" onclick="openAdd('isbn')">📷 Usar ISBN</button>`;
 }
 function selS(el){document.querySelectorAll('.mopt').forEach(e=>e.classList.remove('on'));el.classList.add('on')}
+let _searchCache={};
 async function gbSearch(q){
   const res=document.getElementById('gb-results');
   if(!q||q.length<3){res.style.display='none';return}
@@ -626,17 +627,60 @@ async function gbSearch(q){
   res.style.display='block';
   res.innerHTML='<div style="padding:10px 12px;font-size:11px;color:var(--muted)">Buscando...</div>';
   _gbTimer=setTimeout(async()=>{
+    // Try Open Library first — no rate limit, generous quota
+    try{
+      const r=await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(q)}&limit=6&fields=key,title,author_name,first_publish_year,cover_i,publisher,language,number_of_pages_median,isbn`);
+      if(r.ok){
+        const d=await r.json();
+        const docs=(d.docs||[]).filter(doc=>doc.title);
+        if(docs.length){
+          _searchCache={};
+          res.innerHTML=docs.map((doc,i)=>{
+            const id='ol_'+i;
+            _searchCache[id]={
+              title:doc.title,
+              author:(doc.author_name||[])[0]||'',
+              cover:doc.cover_i?`https://covers.openlibrary.org/b/id/${doc.cover_i}-M.jpg`:'',
+              year:doc.first_publish_year||'',
+              publisher:(doc.publisher||[])[0]||'',
+              language:(doc.language||[])[0]||'',
+              pages:doc.number_of_pages_median||0,
+              isbn:(doc.isbn||[])[0]||'',
+              genre:'',
+              source:'ol',
+            };
+            const cover=_searchCache[id].cover;
+            return`<div class="sar" onclick="fillFromCache('${id}')"><div style="flex-shrink:0">${cover?`<img src="${cover}" style="width:32px;height:44px;border-radius:2px;object-fit:cover" onerror="this.style.display='none'">`:'<div style="width:32px;height:44px;background:var(--bg);border-radius:2px;display:flex;align-items:center;justify-content:center">📖</div>'}</div><div><div style="font-size:12px;color:var(--parchment)">${doc.title}</div><div style="font-size:10px;color:var(--muted)">${(doc.author_name||[])[0]||''}${doc.first_publish_year?' · '+doc.first_publish_year:''}</div></div></div>`;
+          }).join('');
+          return;
+        }
+      }
+    }catch(e){}
+    // Fallback to Google Books if Open Library found nothing
     try{
       const r=await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=6`);
+      if(r.status===429){res.innerHTML='<div style="padding:10px 12px;font-size:11px;color:#a05050">Límite de búsquedas alcanzado.<br>Espera unos minutos o introduce los datos manualmente.</div>';return}
       if(!r.ok){res.innerHTML=`<div style="padding:10px 12px;font-size:11px;color:#a05050">Error de conexión (${r.status})</div>`;return}
       const d=await r.json();const items=d.items||[];
       if(!items.length){res.innerHTML='<div style="padding:10px 12px;font-size:11px;color:var(--muted)">Sin resultados. Prueba a escribir el autor también.</div>';return}
-      res.innerHTML=items.map(item=>{
+      _searchCache={};
+      res.innerHTML=items.map((item,i)=>{
         const info=item.volumeInfo;const cover=fixUrl(info.imageLinks?.thumbnail||'');
-        return`<div class="sar" onclick="fillGB('${item.id}')"><div style="flex-shrink:0">${cover?`<img src="${cover}" style="width:32px;height:44px;border-radius:2px;object-fit:cover" onerror="this.style.display='none'">`:'<div style="width:32px;height:44px;background:var(--bg);border-radius:2px;display:flex;align-items:center;justify-content:center">📖</div>'}</div><div><div style="font-size:12px;color:var(--parchment)">${info.title}</div><div style="font-size:10px;color:var(--muted)">${(info.authors||[])[0]||''}</div></div></div>`;
+        const id='gb_'+i;
+        _searchCache[id]={title:info.title,author:(info.authors||[])[0]||'',cover,genre:(info.categories||[])[0]||'',year:(info.publishedDate||'').slice(0,4),publisher:info.publisher||'',language:info.language||'',isbn:(info.industryIdentifiers||[]).find(x=>x.type==='ISBN_13')?.identifier||'',pages:info.pageCount||0,source:'gb'};
+        return`<div class="sar" onclick="fillFromCache('${id}')"><div style="flex-shrink:0">${cover?`<img src="${cover}" style="width:32px;height:44px;border-radius:2px;object-fit:cover" onerror="this.style.display='none'">`:'<div style="width:32px;height:44px;background:var(--bg);border-radius:2px;display:flex;align-items:center;justify-content:center">📖</div>'}</div><div><div style="font-size:12px;color:var(--parchment)">${info.title}</div><div style="font-size:10px;color:var(--muted)">${(info.authors||[])[0]||''}</div></div></div>`;
       }).join('');
     }catch(e){res.innerHTML=`<div style="padding:10px 12px;font-size:11px;color:#a05050">Error: ${e.message}</div>`;}
-  },350);
+  },600);
+}
+function fillFromCache(id){
+  const info=_searchCache[id];if(!info)return;
+  document.getElementById('ai-title').value=info.title||'';
+  document.getElementById('ai-author').value=info.author||'';
+  document.getElementById('ai-genre').value=info.genre||'';
+  document.getElementById('ai-year').value=info.year||'';
+  document.getElementById('gb-results').style.display='none';
+  _gbSel={...info,cover:fixUrl(info.cover||'')};
 }
 async function fillGB(gbId){
   try{

@@ -1,4 +1,4 @@
-const CACHE='finis-africae-v4';
+const CACHE='finis-africae-v6';
 const ASSETS=['./','./index.html','./manifest.json'];
 self.addEventListener('install',e=>{
   e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS).catch(()=>{})));
