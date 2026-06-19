@@ -8,6 +8,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>Finis Africae</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📜</text></svg>">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{--bg:#0a0805;--s1:#12100c;--s2:#1a1710;--border:#2e2a1e;--text:#e8dfc8;--muted:#6b6045;--gold:#c8a96e;--gold2:#a07840;--parchment:#d4c89a;--red:#8b2020;--green:#2a5a3a;--font:'Georgia','Times New Roman',serif;--mono:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
@@ -18,8 +20,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .hdr-inner{padding:12px 16px 10px}
 .hdr-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
 .logo-wrap{display:flex;flex-direction:column}
-.logo-latin{font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:2px;font-style:italic;font-family:var(--mono)}
-.logo{font-size:22px;font-weight:400;letter-spacing:1px;color:var(--parchment);font-style:italic;line-height:1;text-shadow:0 0 30px rgba(200,169,110,.2)}
+.logo-latin{font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:2px;font-family:var(--mono)}
+.logo{font-size:22px;font-weight:400;letter-spacing:1px;color:var(--parchment);line-height:1;text-shadow:0 0 30px rgba(200,169,110,.2)}
 .logo-sub{font-size:8px;letter-spacing:4px;color:var(--muted);text-transform:uppercase;margin-top:3px;font-family:var(--mono)}
 .hdr-btns{display:flex;gap:6px;margin-top:4px}
 .ibtn{width:32px;height:32px;border-radius:3px;background:var(--s2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;transition:border-color .15s}
@@ -30,7 +32,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .sbox{position:relative}
 .sinput{width:100%;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:3px;padding:8px 12px 8px 30px;color:var(--text);font-size:13px;font-family:var(--mono);outline:none;transition:border-color .15s}
 .sinput:focus{border-color:var(--gold2)}
-.sinput::placeholder{color:var(--muted);font-style:italic}
+.sinput::placeholder{color:var(--muted);}
 .sicon{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--muted);pointer-events:none}
 .sresults{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--s1);border:1px solid var(--border);border-radius:3px;z-index:40;max-height:220px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.6)}
 .sitem{padding:9px 12px;font-size:12px;cursor:pointer;border-bottom:1px solid var(--border);font-family:var(--mono)}
@@ -60,17 +62,17 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .rcard-lbl{font-size:8px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:9px;font-family:var(--mono)}
 .rcard-inner{display:flex;gap:12px}
 .rinfo{flex:1;min-width:0}
-.rtitle{font-size:15px;font-style:italic;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--parchment)}
+.rtitle{font-size:15px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--parchment)}
 .rauthor{font-size:10px;color:var(--muted);margin-bottom:8px;font-family:var(--mono);cursor:pointer}
 .rauthor:hover{color:var(--gold)}
 .pbar-lbl{display:flex;justify-content:space-between;font-size:9px;color:var(--muted);margin-bottom:4px;font-family:var(--mono)}
 .pbar{height:3px;background:rgba(0,0,0,.4);border-radius:1px;overflow:hidden}
 .pfill{height:100%;background:linear-gradient(90deg,var(--gold2),var(--gold));border-radius:1px}
-.rnote{font-size:11px;color:rgba(200,169,110,.4);margin-top:6px;font-style:italic;line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rnote{font-size:11px;color:rgba(200,169,110,.4);margin-top:6px;line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bcard{display:flex;gap:11px;padding:10px;background:var(--s1);border-radius:3px;border:1px solid var(--border);margin-bottom:7px;cursor:pointer;transition:border-color .15s,background .15s}
 .bcard:hover{border-color:var(--gold2);background:var(--s2)}
 .binfo{flex:1;min-width:0}
-.btitle{font-size:13px;font-style:italic;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--parchment);cursor:pointer}
+.btitle{font-size:13px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--parchment);cursor:pointer}
 .bauthor{font-size:10px;color:var(--muted);margin-bottom:5px;font-family:var(--mono);cursor:pointer}
 .bauthor:hover{color:var(--gold);text-decoration:underline}
 .bmeta{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
@@ -85,19 +87,19 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .ytag:hover{color:var(--gold)}
 .bact{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
 .plbl{font-size:8px;padding:2px 6px;border-radius:2px;background:rgba(139,32,32,.08);color:#a05050;border:1px solid rgba(139,32,32,.15);font-family:var(--mono)}
-.empty{text-align:center;padding:3rem 1rem;color:var(--muted);font-style:italic}
+.empty{text-align:center;padding:3rem 1rem;color:var(--muted);}
 .empty-icon{font-size:40px;margin-bottom:12px;opacity:.5}
 .empty-text{font-size:14px;line-height:1.8}
 .lcard{display:flex;align-items:center;gap:11px;padding:10px;background:var(--s1);border-radius:3px;border:1px solid rgba(139,32,32,.15);margin-bottom:7px}
 .lavatar{width:32px;height:32px;border-radius:50%;background:rgba(139,32,32,.08);border:1px solid rgba(139,32,32,.15);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
 .linfo{flex:1;min-width:0}
-.ltitle{font-size:13px;font-style:italic;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ltitle{font-size:13px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lperson{font-size:10px;color:var(--muted);font-family:var(--mono)}
 .reccard{display:flex;gap:11px;padding:10px;background:var(--s1);border-radius:3px;border:1px solid var(--border);margin-bottom:7px}
 .recinfo{flex:1;min-width:0}
-.rectitle{font-size:13px;font-style:italic;margin-bottom:2px;color:var(--parchment)}
+.rectitle{font-size:13px;margin-bottom:2px;color:var(--parchment)}
 .recauthor{font-size:10px;color:var(--muted);margin-bottom:4px;font-family:var(--mono)}
-.recreason{font-size:11px;color:rgba(200,169,110,.5);line-height:1.5;margin-bottom:7px;font-style:italic}
+.recreason{font-size:11px;color:rgba(200,169,110,.5);line-height:1.5;margin-bottom:7px;}
 .reclinks{display:flex;gap:5px;flex-wrap:wrap}
 .reclink{font-size:9px;padding:3px 8px;border-radius:2px;border:1px solid var(--border);color:var(--muted);cursor:pointer;background:var(--s2);text-decoration:none;font-family:var(--mono);transition:all .15s}
 .reclink:hover{border-color:var(--gold2);color:var(--gold)}
@@ -109,7 +111,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .modal-box{background:var(--s1);border-radius:0;border-top:1px solid var(--border);width:100%;max-width:480px;max-height:92vh;overflow-y:auto;padding:0 0 40px}
 .modal-ornament{height:2px;background:linear-gradient(90deg,transparent,var(--gold2),transparent);margin-bottom:0}
 .modal-head{padding:14px 16px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
-.modal-title{font-size:15px;font-style:italic;flex:1;color:var(--parchment)}
+.modal-title{font-size:15px;flex:1;color:var(--parchment)}
 .modal-close{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1}
 .modal-body{padding:16px}
 .mfield{margin-bottom:14px}
@@ -120,7 +122,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .mselect{display:flex;gap:6px;flex-wrap:wrap}
 .mopt{padding:5px 11px;border-radius:2px;font-size:10px;border:1px solid var(--border);color:var(--muted);cursor:pointer;background:var(--s2);font-family:var(--mono);transition:all .15s}
 .mopt.on{border-color:var(--gold2);color:var(--gold);background:rgba(200,169,110,.08)}
-.mbtn{width:100%;padding:12px;border-radius:2px;border:1px solid var(--gold2);background:rgba(200,169,110,.1);color:var(--gold);font-size:13px;font-style:italic;font-family:var(--font);cursor:pointer;margin-top:6px;transition:all .15s}
+.mbtn{width:100%;padding:12px;border-radius:2px;border:1px solid var(--gold2);background:rgba(200,169,110,.1);color:var(--gold);font-size:13px;font-family:var(--font);cursor:pointer;margin-top:6px;transition:all .15s}
 .mbtn:hover{background:rgba(200,169,110,.15)}
 .mbtn-sec{width:100%;padding:10px;border-radius:2px;border:1px solid var(--border);background:var(--s2);color:var(--muted);font-size:12px;font-family:var(--mono);cursor:pointer;margin-top:8px}
 .isbn-area{background:rgba(0,0,0,.3);border:1px dashed var(--border);border-radius:3px;padding:20px;text-align:center;cursor:pointer;transition:border-color .15s}
@@ -134,14 +136,14 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .dhead{position:sticky;top:0;background:rgba(10,8,5,.97);backdrop-filter:blur(8px);padding:11px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;z-index:1;flex-shrink:0}
 .dhead::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold2),transparent);opacity:.3}
 .dback{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer}
-.dhead-title{font-size:14px;font-style:italic;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--parchment)}
+.dhead-title{font-size:14px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--parchment)}
 .dbody{padding:16px}
 .dhero{display:flex;gap:14px;margin-bottom:18px}
 .dcover-big{width:88px;height:124px;border-radius:3px;overflow:hidden;flex-shrink:0;border:1px solid var(--border);box-shadow:3px 3px 12px rgba(0,0,0,.5)}
 .dcover-big img{width:100%;height:100%;object-fit:cover;display:block}
 .dcover-big-ph{width:88px;height:124px;border-radius:3px;background:var(--s2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0;box-shadow:3px 3px 12px rgba(0,0,0,.5)}
 .dmeta{flex:1;min-width:0}
-.dtitle{font-size:17px;font-style:italic;margin-bottom:3px;line-height:1.2;cursor:pointer;color:var(--parchment)}
+.dtitle{font-size:17px;margin-bottom:3px;line-height:1.2;cursor:pointer;color:var(--parchment)}
 .dtitle:hover{color:var(--gold);text-decoration:underline}
 .dauthor{font-size:12px;color:var(--muted);margin-bottom:9px;cursor:pointer;font-family:var(--mono)}
 .dauthor:hover{color:var(--gold);text-decoration:underline}
@@ -151,7 +153,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .dsopt.on{border-color:var(--gold2);color:var(--gold);background:rgba(200,169,110,.08)}
 .dsec{font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin:16px 0 8px;font-family:var(--mono);display:flex;align-items:center;gap:8px}
 .dsec::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
-.dnote{width:100%;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:2px;padding:10px 12px;color:var(--text);font-size:13px;font-family:var(--font);font-style:italic;outline:none;resize:none;line-height:1.7;min-height:90px;transition:border-color .15s}
+.dnote{width:100%;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:2px;padding:10px 12px;color:var(--text);font-size:13px;font-family:var(--font);outline:none;resize:none;line-height:1.7;min-height:90px;transition:border-color .15s}
 .dnote:focus{border-color:var(--gold2)}
 .dnote::placeholder{color:var(--muted)}
 .dinfo-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px}
@@ -164,10 +166,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .imodal{position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.9);display:flex;align-items:flex-end;justify-content:center}
 .ibox{background:var(--s1);border-top:1px solid var(--border);width:100%;max-width:480px;max-height:85vh;overflow-y:auto;padding:0 0 40px}
 .ihead{padding:14px 16px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;position:sticky;top:0;background:var(--s1);z-index:1}
-.ihead-title{font-size:15px;font-style:italic;flex:1;color:var(--parchment)}
+.ihead-title{font-size:15px;flex:1;color:var(--parchment)}
 .ibody{padding:16px}
 .ibio-photo{width:76px;height:76px;border-radius:50%;object-fit:cover;object-position:top;border:1px solid var(--border);float:right;margin:0 0 10px 12px;box-shadow:2px 2px 8px rgba(0,0,0,.4)}
-.ibio-text{font-size:13px;color:rgba(232,223,200,.65);line-height:1.85;font-style:italic}
+.ibio-text{font-size:13px;color:rgba(232,223,200,.65);line-height:1.85;}
 .ibio-links{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px;clear:both}
 .ilink{font-size:10px;padding:4px 10px;border-radius:2px;border:1px solid var(--border);color:var(--muted);text-decoration:none;background:var(--s2);font-family:var(--mono)}
 .ilink:hover{border-color:var(--gold2);color:var(--gold)}
@@ -178,7 +180,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .bitem{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:8px;color:var(--muted);cursor:pointer;padding:4px;font-family:var(--mono);letter-spacing:.5px;text-transform:uppercase;transition:color .15s}
 .bitem.on{color:var(--gold)}
 .bitem-icon{font-size:18px}
-.loading{text-align:center;padding:20px;color:var(--muted);font-size:13px;font-style:italic}
+.loading{text-align:center;padding:20px;color:var(--muted);font-size:13px;}
 .prog-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .prog-input{width:68px;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:2px;padding:6px 8px;color:var(--text);font-size:12px;font-family:var(--mono);outline:none;text-align:center}
 </style>
@@ -195,6 +197,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
           <div class="logo-sub">Catalogus Librorum</div>
         </div>
         <div class="hdr-btns">
+          <div class="ibtn" onclick="installApp()" title="Instalar app">⬇</div>
           <div class="ibtn" onclick="openAdd('isbn')" title="ISBN">📷</div>
           <div class="ibtn" onclick="openAdd('manual')" title="Añadir">➕</div>
         </div>
@@ -346,7 +349,7 @@ function renderBiblioteca(){
     h+=`<div class="slabel">${leyendo.length?'Otros libros':'Todos los libros'}</div>`;
     resto.forEach(b=>{
       const loan=DB.loans.find(l=>l.bookId===b.id&&!l.returned);
-      h+=`<div class="bcard" onclick="openDetail('${b.id}')"><div style="width:42px;height:60px;border-radius:2px;overflow:hidden;flex-shrink:0;border:1px solid var(--border);box-shadow:1px 1px 6px rgba(0,0,0,.4)">${coverEl(b,42,60)}</div><div class="binfo"><div class="btitle" onclick="event.stopPropagation();showSynopsis('${esc(b.title)}','${esc(b.author||'')}')">${b.title}</div><div class="bauthor" onclick="event.stopPropagation();setFilter('author','${esc(b.author||'')}')">${b.author||''}</div><div class="bmeta">${sbadge(b.status||'pendiente')}${b.genre?`<span class="gtag" onclick="event.stopPropagation();setFilter('genre','${esc(b.genre)}')">${b.genre}</span>`:''}${b.year?`<span class="ytag" onclick="event.stopPropagation();setFilter('year','${b.year}')">${b.year}</span>`:''}${b.rating?`<span style="color:var(--gold);font-size:10px">${stars(b.rating)}</span>`:''}</div></div><div class="bact">${loan?`<span class="plbl">📤 ${loan.person}</span>`:''}</div></div>`;
+      h+=`<div class="bcard" onclick="openDetail('${b.id}')"><div style="width:42px;height:60px;border-radius:2px;overflow:hidden;flex-shrink:0;border:1px solid var(--border);box-shadow:1px 1px 6px rgba(0,0,0,.4)">${coverEl(b,42,60)}</div><div class="binfo"><div class="btitle" onclick="event.stopPropagation();showSynopsis('${esc(b.title)}','${esc(b.author||'')}')">${b.title}</div><div class="bauthor" onclick="event.stopPropagation();setFilter('author','${esc(b.author||'')}')">${b.author||''}</div><div class="bmeta">${sbadge(b.status||'pendiente')}${b.genre?`<span class="gtag" onclick="event.stopPropagation();setFilter('genre','${esc(b.genre)}')">${b.genre}</span>`:''}${b.year?`<span class="ytag" onclick="event.stopPropagation();setFilter('year','${b.year}')">${b.year}</span>`:''}${b.fromLibrary?'<span class="gtag" style="color:#5a9a6a;border-color:rgba(90,154,106,.2)">📚 Biblioteca</span>':''}${b.rating?`<span style="color:var(--gold);font-size:10px">${stars(b.rating)}</span>`:''}</div></div><div class="bact">${loan?`<span class="plbl">📤 ${loan.person}</span>`:''}</div></div>`;
     });
   }
   el.innerHTML=h;
@@ -417,7 +420,10 @@ function renderEstadisticas(){
   let h=`<div style="display:flex;gap:8px;margin-bottom:12px"><div style="flex:1;background:var(--s1);border:1px solid var(--border);border-radius:2px;padding:12px;text-align:center"><div style="font-size:26px;color:var(--gold);font-family:var(--font)">${books.length}</div><div style="font-size:9px;color:var(--muted);font-family:var(--mono);letter-spacing:.5px;text-transform:uppercase">Total</div></div><div style="flex:1;background:var(--s1);border:1px solid var(--border);border-radius:2px;padding:12px;text-align:center"><div style="font-size:26px;color:var(--gold);font-family:var(--font)">${leidos}</div><div style="font-size:9px;color:var(--muted);font-family:var(--mono);letter-spacing:.5px;text-transform:uppercase">Leídos</div></div><div style="flex:1;background:var(--s1);border:1px solid var(--border);border-radius:2px;padding:12px;text-align:center"><div style="font-size:26px;color:var(--gold);font-family:var(--font)">${lyr}</div><div style="font-size:9px;color:var(--muted);font-family:var(--mono);letter-spacing:.5px;text-transform:uppercase">Este año</div></div></div>`;
   if(tg.length){h+='<div class="slabel">Géneros</div>';const mx=tg[0][1];tg.forEach(([g,n])=>{h+=`<div class="sbar-wrap"><div class="sbar-label"><span style="cursor:pointer;color:var(--gold)" onclick="setFilter('genre','${esc(g)}');setTab('biblioteca',null)">${g}</span><span style="color:var(--muted)">${n}</span></div><div class="sbar-track"><div class="sbar-fill" style="width:${Math.round(n/mx*100)}%"></div></div></div>`})}
   if(ta.length){h+='<div class="slabel">Autores</div>';const mx=ta[0][1];ta.forEach(([a,n])=>{h+=`<div class="sbar-wrap"><div class="sbar-label"><span style="cursor:pointer;color:var(--gold)" onclick="setFilter('author','${esc(a)}');setTab('biblioteca',null)">${a}</span><span style="color:var(--muted)">${n}</span></div><div class="sbar-track"><div class="sbar-fill" style="width:${Math.round(n/mx*100)}%;background:linear-gradient(90deg,var(--gold2),var(--gold))"></div></div></div>`})}
-  h+=`<div class="slabel" style="margin-top:20px">Copia de seguridad</div><div style="display:flex;gap:8px;margin-bottom:10px"><button onclick="exportData()" style="flex:1;padding:10px;border-radius:2px;border:1px solid var(--gold2);background:rgba(200,169,110,.08);color:var(--gold);font-family:var(--mono);font-size:10px;cursor:pointer;letter-spacing:.5px">📥 Exportar</button><label style="flex:1;padding:10px;border-radius:2px;border:1px solid var(--border);background:var(--s2);color:var(--muted);font-family:var(--mono);font-size:10px;cursor:pointer;text-align:center;display:flex;align-items:center;justify-content:center;letter-spacing:.5px">📤 Importar<input type="file" accept=".json" onchange="importData(this)" style="display:none"></label></div><div style="font-size:11px;color:var(--muted);line-height:1.6;background:var(--s2);border-radius:2px;padding:10px;border:1px solid var(--border);font-style:italic">Exporta para guardar una copia. Importa para restaurar en otro dispositivo.</div>`;
+  h+=`<div class="slabel" style="margin-top:20px">Copia de seguridad</div><div style="display:flex;gap:8px;margin-bottom:10px"><button onclick="exportData()" style="flex:1;padding:10px;border-radius:2px;border:1px solid var(--gold2);background:rgba(200,169,110,.08);color:var(--gold);font-family:var(--mono);font-size:10px;cursor:pointer;letter-spacing:.5px">📥 Exportar</button><label style="flex:1;padding:10px;border-radius:2px;border:1px solid var(--border);background:var(--s2);color:var(--muted);font-family:var(--mono);font-size:10px;cursor:pointer;text-align:center;display:flex;align-items:center;justify-content:center;letter-spacing:.5px">📤 Importar<input type="file" accept=".json" onchange="importData(this)" style="display:none"></label></div><div style="font-size:11px;color:var(--muted);line-height:1.6;background:var(--s2);border-radius:2px;padding:10px;border:1px solid var(--border);">Exporta para guardar una copia. Importa para restaurar en otro dispositivo.</div>
+  <div class="slabel" style="margin-top:18px">Importar desde Goodreads</div>
+  <label style="display:block;padding:10px;border-radius:2px;border:1px dashed var(--gold2);background:rgba(200,169,110,.05);color:var(--gold);font-family:var(--mono);font-size:10px;cursor:pointer;text-align:center;letter-spacing:.5px;margin-bottom:8px">📚 Subir CSV de Goodreads<input type="file" accept=".csv" onchange="importGoodreads(this)" style="display:none"></label>
+  <div style="font-size:11px;color:var(--muted);line-height:1.7;background:var(--s2);border-radius:2px;padding:10px;border:1px solid var(--border)">Goodreads → Mis libros → Herramientas → Importar/Exportar → Exportar biblioteca. Sube el CSV descargado aquí.</div>`;
   el.innerHTML=h;
 }
 function exportData(){
@@ -436,6 +442,77 @@ function importData(input){
     DB.books=data.books;DB.loans=data.loans||[];renderStats();renderEstadisticas();alert(`✅ ${data.books.length} libros importados.`);
     }catch(err){alert('Error al importar.');}
   };reader.readAsText(file);
+}
+
+// ── GOODREADS CSV IMPORT ──────────────────
+function parseCSVLine(line){
+  const result=[];let cur='',inQuotes=false;
+  for(let i=0;i<line.length;i++){
+    const ch=line[i];
+    if(ch==='"'){
+      if(inQuotes&&line[i+1]==='"'){cur+='"';i++;}
+      else inQuotes=!inQuotes;
+    } else if(ch===','&&!inQuotes){result.push(cur);cur='';}
+    else cur+=ch;
+  }
+  result.push(cur);
+  return result;
+}
+function parseCSV(text){
+  const lines=text.split(/\r?\n/).filter(l=>l.trim());
+  if(!lines.length)return[];
+  const headers=parseCSVLine(lines[0]).map(h=>h.trim().replace(/^"|"$/g,''));
+  return lines.slice(1).map(line=>{
+    const vals=parseCSVLine(line).map(v=>v.trim().replace(/^"|"$/g,''));
+    const obj={};
+    headers.forEach((h,i)=>{obj[h]=vals[i]||'';});
+    return obj;
+  });
+}
+function importGoodreads(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const rows=parseCSV(e.target.result);
+      if(!rows.length)throw new Error('CSV vacío');
+      const statusMap={'read':'leido','currently-reading':'leyendo','to-read':'pendiente'};
+      const existing=new Set(DB.books.map(b=>(b.title+'|'+b.author).toLowerCase()));
+      const newBooks=[];
+      rows.forEach(row=>{
+        const title=row['Title']||row['title']||'';
+        if(!title)return;
+        const author=row['Author']||row['author']||'';
+        const key=(title+'|'+author).toLowerCase();
+        if(existing.has(key))return;
+        const shelf=(row['Exclusive Shelf']||row['exclusive shelf']||'to-read').toLowerCase();
+        const status=statusMap[shelf]||'pendiente';
+        const rating=parseInt(row['My Rating']||row['my rating']||'0')||0;
+        const year=row['Year Published']||row['Original Publication Year']||'';
+        const isbn=(row['ISBN13']||row['ISBN']||'').replace(/[="]/g,'');
+        const dateRead=row['Date Read']||'';
+        const dateAdded=row['Date Added']||'';
+        const pages=parseInt(row['Number of Pages']||'0')||0;
+        const publisher=row['Publisher']||'';
+        const genre=row['Bookshelves']?.split(',')[0]?.trim()||'';
+        newBooks.push({
+          id:uid(),title,author,genre,year,status,
+          cover:'',publisher,isbn,totalPages:pages,currentPage:0,
+          notes:row['My Review']||'',rating,loaned:false,
+          addedAt:Date.now(),
+          finishedYear:dateRead?new Date(dateRead).getFullYear():null,
+          startDate:dateAdded?new Date(dateAdded).toISOString().slice(0,10):'',
+          endDate:dateRead?new Date(dateRead).toISOString().slice(0,10):'',
+        });
+      });
+      if(!newBooks.length){alert('No se encontraron libros nuevos para importar (puede que ya estén todos en tu biblioteca).');return;}
+      if(!confirm(`¿Importar ${newBooks.length} libros desde Goodreads?`))return;
+      DB.books=[...DB.books,...newBooks];
+      renderStats();renderEstadisticas();
+      alert(`✅ ${newBooks.length} libros importados desde Goodreads.\n\nLas portadas se completarán automáticamente al abrir cada libro.`);
+    }catch(err){alert('Error al leer el CSV de Goodreads. Verifica que es el archivo correcto.');}
+  };
+  reader.readAsText(file);
 }
 
 // ── DETAIL ────────────────────────────────
@@ -460,6 +537,9 @@ function renderDetail(book){
     </div>
   </div>
   ${book.status==='leyendo'?`<div class="dsec">Progreso</div><div class="prog-row"><span style="font-size:11px;color:var(--muted);font-family:var(--mono)">Página</span><input class="prog-input" type="number" value="${book.currentPage||0}" min="0" onchange="setPage('${book.id}',this.value)"><span style="font-size:11px;color:var(--muted);font-family:var(--mono)">de</span><input class="prog-input" type="number" value="${book.totalPages||''}" placeholder="total" onchange="setTotal('${book.id}',this.value)">${book.totalPages?`<span style="font-size:11px;color:var(--gold);font-family:var(--mono)">${pct}%</span>`:''}</div>${book.totalPages?`<div class="pbar" style="height:4px;margin-top:8px"><div class="pfill" style="width:${pct}%"></div></div>`:''}`:''}
+  <div class="dsec">Fechas de lectura</div>
+  <div class="dinfo-row"><span>Inicio</span><input type="date" value="${book.startDate||''}" onchange="setField('${book.id}','startDate',this.value)"></div>
+  <div class="dinfo-row"><span>Fin</span><input type="date" value="${book.endDate||''}" onchange="setField('${book.id}','endDate',this.value)"></div>
   <div class="dsec">Notas</div>
   <textarea class="dnote" placeholder="Reflexiones, frases memorables, opinión..." onchange="setField('${book.id}','notes',this.value)">${book.notes||''}</textarea>
   <div class="dsec">Información</div>
@@ -470,6 +550,8 @@ function renderDetail(book){
   <div class="dinfo-row"><span>Idioma original</span><input value="${book.language||''}" placeholder="Idioma" onchange="setField('${book.id}','language',this.value)"></div>
   <div class="dinfo-row"><span>Páginas</span><input value="${book.totalPages||''}" placeholder="Páginas" type="number" onchange="setTotal('${book.id}',this.value)"></div>
   <div class="dinfo-row"><span>ISBN</span><input value="${book.isbn||''}" placeholder="ISBN" onchange="setField('${book.id}','isbn',this.value)"></div>
+  <div class="dinfo-row"><span>Préstamo biblioteca</span><div style="display:flex;gap:6px"><div class="mopt${book.fromLibrary?' on':''}" style="padding:3px 9px;font-size:9px" onclick="toggleLibrary('${book.id}',this)">${book.fromLibrary?'✓ Sí':'No'}</div></div></div>
+  ${book.fromLibrary?`<div class="dinfo-row"><span>Fecha devolución</span><input type="date" value="${book.dueDate||''}" onchange="setField('${book.id}','dueDate',this.value)"></div>`:''}
   <div class="dsec">Acciones</div>
   <div class="dbtns">
     ${loan?`<div class="dbtn danger" onclick="returnLoan('${loan.id}');closeDetail()">✅ Devuelto</div>`:`<div class="dbtn" onclick="openLoanModal('${book.id}')">📤 Prestar</div>`}
@@ -479,10 +561,22 @@ function renderDetail(book){
 }
 function closeDetail(){document.getElementById('dmodal').classList.remove('show');currentBookId=null;renderBiblioteca();renderStats()}
 function deleteBook(){if(!currentBookId||!confirm('¿Eliminar este libro?'))return;DB.books=DB.books.filter(b=>b.id!==currentBookId);DB.loans=DB.loans.filter(l=>l.bookId!==currentBookId);closeDetail()}
-function setStatus(id,status,el){const books=DB.books;const b=books.find(x=>x.id===id);if(!b)return;b.status=status;if(status==='leido')b.finishedYear=new Date().getFullYear();DB.books=books;document.querySelectorAll('.dsopt').forEach(e=>e.classList.remove('on'));el.classList.add('on');renderDetail(b)}
+function setStatus(id,status,el){
+  const books=DB.books;const b=books.find(x=>x.id===id);if(!b)return;
+  b.status=status;
+  const today=new Date().toISOString().slice(0,10);
+  if(status==='leido'){b.finishedYear=new Date().getFullYear();if(!b.endDate)b.endDate=today;if(!b.startDate)b.startDate=today;}
+  if(status==='leyendo'&&!b.startDate)b.startDate=today;
+  DB.books=books;document.querySelectorAll('.dsopt').forEach(e=>e.classList.remove('on'));el.classList.add('on');renderDetail(b);
+}
 function setRating(container){const val=parseInt(event.target.dataset.val||0);if(!val||!currentBookId)return;const books=DB.books;const b=books.find(x=>x.id===currentBookId);if(!b)return;b.rating=val;DB.books=books;container.querySelectorAll('span').forEach((s,i)=>{s.style.color=i<val?'var(--gold)':'var(--border)';s.textContent=i<val?'★':'☆'})}
 function setPage(id,val){const books=DB.books;const b=books.find(x=>x.id===id);if(b){b.currentPage=parseInt(val)||0;DB.books=books}}
 function setTotal(id,val){const books=DB.books;const b=books.find(x=>x.id===id);if(b){b.totalPages=parseInt(val)||0;DB.books=books;renderDetail(b)}}
+function toggleLibrary(id,el){
+  const books=DB.books;const b=books.find(x=>x.id===id);
+  if(!b)return;b.fromLibrary=!b.fromLibrary;DB.books=books;
+  renderDetail(b);
+}
 function setField(id,field,val){const books=DB.books;const b=books.find(x=>x.id===id);if(b){b[field]=val;DB.books=books}}
 
 // ── LOAN ──────────────────────────────────
@@ -535,7 +629,7 @@ async function gbSearch(q){
       res.style.display='block';
       res.innerHTML=items.map(item=>{
         const info=item.volumeInfo;const cover=fixUrl(info.imageLinks?.thumbnail||'');
-        return`<div class="sar" onclick="fillGB('${item.id}')"><div style="flex-shrink:0">${cover?`<img src="${cover}" style="width:32px;height:44px;border-radius:2px;object-fit:cover" onerror="this.style.display='none'">`:'<div style="width:32px;height:44px;background:var(--bg);border-radius:2px;display:flex;align-items:center;justify-content:center">📖</div>'}</div><div><div style="font-size:12px;font-style:italic;color:var(--parchment)">${info.title}</div><div style="font-size:10px;color:var(--muted)">${(info.authors||[])[0]||''}</div></div></div>`;
+        return`<div class="sar" onclick="fillGB('${item.id}')"><div style="flex-shrink:0">${cover?`<img src="${cover}" style="width:32px;height:44px;border-radius:2px;object-fit:cover" onerror="this.style.display='none'">`:'<div style="width:32px;height:44px;background:var(--bg);border-radius:2px;display:flex;align-items:center;justify-content:center">📖</div>'}</div><div><div style="font-size:12px;color:var(--parchment)">${info.title}</div><div style="font-size:10px;color:var(--muted)">${(info.authors||[])[0]||''}</div></div></div>`;
       }).join('');
     }catch(e){res.style.display='none'}
   },400);
@@ -555,7 +649,7 @@ function saveManual(){
 }
 function renderISBN(){
   document.getElementById('add-body').innerHTML=`
-  <div class="isbn-area" onclick="scanISBN()"><div style="font-size:32px;margin-bottom:8px">📷</div><div style="font-size:13px;color:var(--muted);font-style:italic">Toca para usar la cámara</div></div>
+  <div class="isbn-area" onclick="scanISBN()"><div style="font-size:32px;margin-bottom:8px">📷</div><div style="font-size:13px;color:var(--muted);">Toca para usar la cámara</div></div>
   <div style="text-align:center;padding:10px 0;font-size:11px;color:var(--muted);font-family:var(--mono)">— o introduce el ISBN —</div>
   <div class="mfield"><input class="minput" id="isbn-input" placeholder="978-..." oninput="if(this.value.replace(/\D/g,'').length>=10)lookupISBN(this.value)"></div>
   <div id="isbn-result"></div>
@@ -577,7 +671,7 @@ async function lookupISBN(isbn){
     // Fallback Open Library
     const r=await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${clean}&format=json&jscmd=data`);
     const d=await r.json();const key=Object.keys(d)[0];
-    if(!key){res.innerHTML='<div style="text-align:center;padding:12px;color:var(--muted);font-size:13px;font-style:italic">No encontrado.</div>';return}
+    if(!key){res.innerHTML='<div style="text-align:center;padding:12px;color:var(--muted);font-size:13px;">No encontrado.</div>';return}
     const book=d[key];const cover=book.cover?.medium||book.cover?.small||''  ;const title=book.title||''  ;const author=(book.authors||[])[0]?.name||''  ;const year=(book.publish_date||'').slice(-4);
     res.innerHTML=`<div class="bcard" style="margin-bottom:12px"><div style="width:42px;height:60px;border-radius:2px;overflow:hidden;border:1px solid var(--border)">${cover?`<img src="${fixUrl(cover)}" style="width:42px;height:60px;object-fit:cover">`:`<div style="width:42px;height:60px;display:flex;align-items:center;justify-content:center;background:var(--s2);font-size:18px">📖</div>`}</div><div class="binfo"><div class="btitle">${title}</div><div class="bauthor">${author}</div></div></div><button class="mbtn" onclick="saveISBN('${esc(title)}','${esc(author)}','${fixUrl(cover)}','${year}','${clean}','','','',0)">Añadir a mi biblioteca</button>`;
   }catch(e){res.innerHTML='<div style="text-align:center;padding:12px;color:#a05050;font-size:13px">Error. Intenta de nuevo.</div>'}
@@ -622,7 +716,7 @@ async function showAuthor(author){
     let h=''  ;
     if(photo)h+=`<img class="ibio-photo" src="${photo}">`;
     h+=bio?`<div class="ibio-text">${bio}</div>`:'<div class="ibio-text">Biografía no disponible.</div>'  ;
-    if(biblio.length)h+=`<div style="margin-top:14px;clear:both"><div class="dsec" style="margin-top:0">Bibliografía</div>${biblio.map(t=>`<div style="font-size:12px;padding:5px 0;border-bottom:1px solid var(--border);color:rgba(232,223,200,.65);font-style:italic">${t}</div>`).join('')}</div>`;
+    if(biblio.length)h+=`<div style="margin-top:14px;clear:both"><div class="dsec" style="margin-top:0">Bibliografía</div>${biblio.map(t=>`<div style="font-size:12px;padding:5px 0;border-bottom:1px solid var(--border);color:rgba(232,223,200,.65);">${t}</div>`).join('')}</div>`;
     h+=`<div class="ibio-links" style="margin-top:12px;clear:both"><a class="ilink" href="https://es.wikipedia.org/wiki/${wq}" target="_blank">Wikipedia ↗</a><a class="ilink" href="https://www.goodreads.com/search?q=${encodeURIComponent(author)}" target="_blank">Goodreads ↗</a></div>`;
     document.getElementById('i-body').innerHTML=h;
   }catch(e){document.getElementById('i-body').innerHTML='<div class="ibio-text">No se pudo cargar.</div>'}
@@ -641,6 +735,20 @@ if(!DB.books.length){
   DB.loans=[{id:uid(),bookId:DB.books[0].id,person:'Marcos',date:Date.now()-864e5*45,returned:false}];
 }
 renderStats();renderBiblioteca();
+
+// ── PWA install ──────────────────────────
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
+}
+let deferredInstall=null;
+window.addEventListener('beforeinstallprompt',(e)=>{
+  e.preventDefault();
+  deferredInstall=e;
+});
+function installApp(){
+  if(deferredInstall){deferredInstall.prompt();}
+  else alert('Para instalar: usa el menú del navegador → "Añadir a pantalla de inicio" o "Instalar app".');
+}
 </script>
 </body>
 </html>
