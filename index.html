@@ -623,18 +623,20 @@ async function gbSearch(q){
   const res=document.getElementById('gb-results');
   if(!q||q.length<3){res.style.display='none';return}
   clearTimeout(_gbTimer);
+  res.style.display='block';
+  res.innerHTML='<div style="padding:10px 12px;font-size:11px;color:var(--muted)">Buscando...</div>';
   _gbTimer=setTimeout(async()=>{
     try{
-      const r=await fetch(`https://www.googleapis.com/books/v1/volumes?q=intitle:${encodeURIComponent(q)}&maxResults=5`);
+      const r=await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=6`);
+      if(!r.ok){res.innerHTML=`<div style="padding:10px 12px;font-size:11px;color:#a05050">Error de conexión (${r.status})</div>`;return}
       const d=await r.json();const items=d.items||[];
-      if(!items.length){res.style.display='none';return}
-      res.style.display='block';
+      if(!items.length){res.innerHTML='<div style="padding:10px 12px;font-size:11px;color:var(--muted)">Sin resultados. Prueba a escribir el autor también.</div>';return}
       res.innerHTML=items.map(item=>{
         const info=item.volumeInfo;const cover=fixUrl(info.imageLinks?.thumbnail||'');
         return`<div class="sar" onclick="fillGB('${item.id}')"><div style="flex-shrink:0">${cover?`<img src="${cover}" style="width:32px;height:44px;border-radius:2px;object-fit:cover" onerror="this.style.display='none'">`:'<div style="width:32px;height:44px;background:var(--bg);border-radius:2px;display:flex;align-items:center;justify-content:center">📖</div>'}</div><div><div style="font-size:12px;color:var(--parchment)">${info.title}</div><div style="font-size:10px;color:var(--muted)">${(info.authors||[])[0]||''}</div></div></div>`;
       }).join('');
-    }catch(e){res.style.display='none'}
-  },400);
+    }catch(e){res.innerHTML=`<div style="padding:10px 12px;font-size:11px;color:#a05050">Error: ${e.message}</div>`;}
+  },350);
 }
 async function fillGB(gbId){
   try{
